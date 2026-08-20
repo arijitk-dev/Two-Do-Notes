@@ -1,0 +1,9 @@
+export type TodoStatus = "pending" | "completed" | "missed";
+export type Priority = "low" | "medium" | "high";
+export type Todo = { id: string; title: string; description?: string | null; scheduled_date: string; original_scheduled_date?: string | null; priority: Priority; status: TodoStatus; created_at: string; updated_at: string; completed_at?: string | null; missed_at?: string | null; miss_reason?: string | null; carried_from_date?: string | null; carry_forward_count: number; carry_forward_bonus_awarded: boolean };
+export type Note = { id: string; title: string; content: string; created_at: string; updated_at: string };
+export type User = { id: string; name: string; email: string; timezone: string };
+export type Dashboard = { today: string; tomorrow: string; user_name: string; total_points: number; today_completed: number; today_total: number; current_streak: number; max_streak: number; todos: Todo[]; unfinished_todos: Todo[]; tomorrow_todos: Todo[]; tomorrow_planned_points: number; recent_notes: Note[] };
+export type Transaction = { id: string; todo_id?: string | null; transaction_type: string; points: number; description: string; created_at: string };
+export type CalendarDay = { date: string; todo_count: number; pending_count: number; completed_count: number; missed_count: number };
+export type CalendarMonth = { year: number; month: number; days: CalendarDay[] };
