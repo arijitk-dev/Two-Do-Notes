@@ -4,7 +4,7 @@ Two Do Notes is a personal productivity and accountability app built around a si
 
 ## Phase 1 and Phase 2 scope
 
-This implementation includes registration/login, timezone-aware scheduled Todos, completion and missed-task ledger transactions, streaks, Notes, dashboard summaries, responsive browser UI, and Docker Compose development. Phase 2 adds a month calendar, date filtering, future planning, +2 points for a Todo first planned for tomorrow, and explicit selected-Todo carry-forward with a one-time +1 completion bonus.
+This implementation includes registration/login, timezone-aware scheduled Todos, completion and missed-task ledger transactions, streaks, Notes, dashboard summaries, responsive browser UI, and Docker Compose development. Phase 2 adds a month calendar, date filtering, future planning, +2 points for a Todo first planned for tomorrow, and explicit selected-Todo carry-forward with a one-time +1 completion bonus. Phase 3 adds truthful completion/miss confirmation, optional Daily Reviews, formal successful-day streaks, planning accuracy, carry-forward and missed-reason analysis, point breakdowns, overplanning detection, and an accountability page.
 
 ## Architecture
 
@@ -13,7 +13,7 @@ The backend is a modular FastAPI application. Routes are thin and delegate busin
 ```
 backend/app/{api,core,db,models,schemas,repositories,services}
 frontend/src/{App.tsx,api.ts,components.tsx,layout.tsx,styles.css}
-backend/alembic/versions/{0001_initial,0002_phase2_planning_carry_forward}.py
+backend/alembic/versions/{0001_initial,0002_phase2_planning_carry_forward,0003_phase3_accountability}.py
 docker-compose.yml
 ```
 
@@ -63,10 +63,21 @@ Backend tests use isolated SQLite and cover authentication, protection, ownershi
 
 Phase 2 API additions include `GET /api/v1/calendar?year=YYYY&month=M`, `GET /api/v1/todos?date=YYYY-MM-DD`, `GET /api/v1/todos/unresolved`, `POST /api/v1/todos/carry-forward`, and `POST /api/v1/todos/{todo_id}/carry-forward`.
 
+## Phase 3 rules
+
+- Completion requires an explicit truthful confirmation in the UI; the backend remains the authority and awards exactly +3 once.
+- Missing requires a reason and awards exactly -7 once. Supported reason codes are `not_enough_time`, `unexpected_work`, `lost_focus`, `too_difficult`, `poor_planning`, and `other`.
+- A successful day has at least one planned Todo, every planned Todo resolved as completed, missed, or carried forward, and a completion rate of at least 80%. Carried-forward and missed Todos are resolved but are not completed.
+- An empty day is neutral and does not add a streak day. Existing calendar-gap behavior remains explicit: a gap separates streak runs.
+- Daily Reviews are optional reflections. They never award or remove points and can be created or updated for historical dates owned by the user.
+- Accountability metrics are derived from Todo state and the immutable point ledger. The rolling 7-day view warns when average planning is at least five Todos per day and completion is below 70%.
+
+Phase 3 API additions include `GET /api/v1/accountability?range=today|7d|month`, `GET /api/v1/reviews/{date}`, `POST /api/v1/reviews/{date}`, and `PATCH /api/v1/reviews/{date}`.
+
 ## Environment variables
 
 See [.env.example](.env.example). `JWT_SECRET` must be replaced for any non-local deployment. `DEFAULT_TIMEZONE` defaults to `Asia/Kolkata`, but all “today” calculations read the user timezone rather than embedding that value in business logic.
 
 ## Future phases
 
-Later phases can add rewards, analytics, daily review, reminders, notifications, PWA support, and Android without changing the ledger or route/service boundaries.
+Later phases can add rewards, reminders, notifications, PWA support, and Android without changing the ledger or route/service boundaries.

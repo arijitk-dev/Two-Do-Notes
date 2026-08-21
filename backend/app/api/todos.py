@@ -64,4 +64,4 @@ def complete_todo(todo_id: str, user: CurrentUser, db: DbSession):
 
 @router.post("/{todo_id}/miss", response_model=TodoResponse)
 def miss_todo(todo_id: str, payload: MissTodoRequest, user: CurrentUser, db: DbSession):
-    return TodoService(db).miss(user, todo_id, payload.reason)
+    return TodoService(db).miss(user, todo_id, payload.reason or "Other", payload.reason_code, payload.reason_text)

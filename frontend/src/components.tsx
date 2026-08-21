@@ -1,22 +1,34 @@
 import { useState, type ReactNode } from "react";
-import type { CalendarMonth, Note, Todo } from "./types";
+import type { CalendarMonth, DailyReview, Note, Todo } from "./types";
 
 export function Spinner() { return <div className="spinner" aria-label="Loading" />; }
 export function ErrorState({ message }: { message: string }) { return <div className="error-box">{message}</div>; }
 export function EmptyState({ children }: { children: ReactNode }) { return <div className="empty-state">{children}</div>; }
 
-export function TodoCard({ todo, onComplete, onMiss, onEdit, onDelete, canComplete = true, canMiss = true }: { todo: Todo; onComplete: () => void; onMiss: (reason: string) => void; onEdit: () => void; onDelete: () => void; canComplete?: boolean; canMiss?: boolean }) {
+const MISS_REASONS = [
+  ["not_enough_time", "Not enough time"],
+  ["unexpected_work", "Unexpected work"],
+  ["lost_focus", "Lost focus"],
+  ["too_difficult", "Task was too difficult"],
+  ["poor_planning", "Poor planning"],
+  ["other", "Other"],
+] as const;
+
+export function TodoCard({ todo, onComplete, onMiss, onEdit, onDelete, canComplete = true, canMiss = true }: { todo: Todo; onComplete: () => void; onMiss: (reason: string, reasonCode?: string, reasonText?: string) => void; onEdit: () => void; onDelete: () => void; canComplete?: boolean; canMiss?: boolean }) {
+  const [showComplete, setShowComplete] = useState(false);
   const [showMiss, setShowMiss] = useState(false);
   const [reasonChoice, setReasonChoice] = useState("");
   const [customReason, setCustomReason] = useState("");
-  const reason = reasonChoice === "Other" ? customReason : reasonChoice;
+  const selectedReason = MISS_REASONS.find(([code]) => code === reasonChoice)?.[1] || "";
+  const reason = reasonChoice === "other" ? customReason : selectedReason;
   const terminal = todo.status !== "pending";
   return <article className={`todo-card ${todo.status}`}>
     <div className="todo-main"><span className={`priority-dot ${todo.priority}`} /> <div><h3>{todo.title}</h3>{todo.description && <p>{todo.description}</p>}</div></div>
     <div className="todo-meta"><span className={`badge ${todo.status}`}>{todo.status}</span><span className={`priority ${todo.priority}`}>{todo.priority} priority</span>{todo.carried_from_date && <span className="carried-badge">↪ Carried from {new Date(`${todo.carried_from_date}T12:00:00`).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>}</div>
-    {!terminal && <div className="todo-actions">{canComplete && <button className="button primary small" onClick={() => window.confirm("Did you actually complete this Todo?") && onComplete()}>Complete</button>}{canMiss && <button className="button subtle small" onClick={() => setShowMiss(true)}>Miss</button>}<button className="text-button" onClick={onEdit}>Edit</button><button className="text-button danger-text" onClick={onDelete}>Delete</button></div>}
+    {!terminal && <div className="todo-actions">{canComplete && <button className="button primary small" onClick={() => setShowComplete(true)}>Complete</button>}{canMiss && <button className="button subtle small" onClick={() => setShowMiss(true)}>Miss</button>}<button className="text-button" onClick={onEdit}>Edit</button><button className="text-button danger-text" onClick={onDelete}>Delete</button></div>}
     {terminal && <div className="todo-actions"><button className="text-button" onClick={onDelete}>Delete</button>{todo.status === "missed" && <span className="miss-reason">Reason: {todo.miss_reason}</span>}</div>}
-    {showMiss && <div className="inline-dialog"><strong>Be honest. It’s okay to miss a Todo, but tell yourself why.</strong><select value={reasonChoice} onChange={e => setReasonChoice(e.target.value)}><option value="">Choose a reason</option><option>Not enough time</option><option>Unexpected work</option><option>Lost focus</option><option>Too difficult</option><option>Poor planning</option><option>Other</option></select>{reasonChoice === "Other" && <input placeholder="Tell yourself why" value={customReason} onChange={e => setCustomReason(e.target.value)} />}{reason && <p className="warning">This will cost you 7 points.</p>}<div><button className="button danger small" disabled={!reason.trim()} onClick={() => { onMiss(reason); setShowMiss(false); }}>Confirm miss</button><button className="text-button" onClick={() => setShowMiss(false)}>Cancel</button></div></div>}
+    {showComplete && <div className="inline-dialog"><strong>Did you actually complete this Todo?</strong><p className="muted">Be honest. Points are a consequence, not the goal.</p><div><button className="button primary small" onClick={() => { onComplete(); setShowComplete(false); }}>Yes, I completed it</button><button className="text-button" onClick={() => setShowComplete(false)}>Cancel</button></div></div>}
+    {showMiss && <div className="inline-dialog"><strong>You didn't complete this Todo. That's okay. Be honest about why.</strong><select value={reasonChoice} onChange={e => setReasonChoice(e.target.value)}><option value="">Choose a reason</option>{MISS_REASONS.map(([code, label]) => <option key={code} value={code}>{label}</option>)}</select>{reasonChoice === "other" && <input placeholder="Tell yourself why" value={customReason} onChange={e => setCustomReason(e.target.value)} />}{reason && <p className="warning">This will cost you 7 points.</p>}<div><button className="button danger small" disabled={!reason.trim()} onClick={() => { onMiss(reason, reasonChoice, reasonChoice === "other" ? customReason : undefined); setShowMiss(false); }}>Confirm miss</button><button className="text-button" onClick={() => setShowMiss(false)}>Cancel</button></div></div>}
   </article>;
 }
 
@@ -36,3 +48,19 @@ export function CarryForwardDialog({ todos, onMove, onKeep, onCancel }: { todos:
 }
 
 export function Toast({ message, onClose }: { message: string; onClose: () => void }) { return <div className="toast" role="status">{message}<button onClick={onClose}>×</button></div>; }
+
+export function AccountabilityMessage({ message }: { message: string }) {
+  return <div className="accountability"><span>✦</span><div><strong>Accountability note</strong><p>{message}</p></div></div>;
+}
+
+export function DailyReviewForm({ review, onSave, saving }: { review: DailyReview; onSave: (data: { mood_score: number | null; went_well: string; improvement: string }) => void; saving?: boolean }) {
+  const [mood, setMood] = useState<number | null>(review.mood_score || null);
+  const [wentWell, setWentWell] = useState(review.went_well || "");
+  const [improvement, setImprovement] = useState(review.improvement || "");
+  return <form className="review-form" onSubmit={event => { event.preventDefault(); onSave({ mood_score: mood, went_well: wentWell, improvement }); }}>
+    <div><strong>How productive were you?</strong><div className="mood-options">{[1, 2, 3, 4, 5].map(value => <button type="button" key={value} className={`mood-option ${mood === value ? "selected" : ""}`} onClick={() => setMood(value)}>{value}</button>)}</div></div>
+    <label>What went well?<textarea rows={4} value={wentWell} onChange={event => setWentWell(event.target.value)} placeholder="Name the work you can rely on." /></label>
+    <label>What could be improved?<textarea rows={4} value={improvement} onChange={event => setImprovement(event.target.value)} placeholder="Make tomorrow more realistic." /></label>
+    <button className="button primary" disabled={saving}>{saving ? "Saving…" : "Finish day"}</button>
+  </form>;
+}

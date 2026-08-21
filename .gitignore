@@ -9,4 +9,5 @@ frontend/node_modules/
 frontend/dist/
 .env
 .DS_Store
-
+graphify-out/cache/
+graphify-out/[0-9]*

@@ -5,7 +5,7 @@ from app.repositories.note_repository import NoteRepository
 from app.repositories.point_repository import PointRepository
 from app.repositories.todo_repository import TodoRepository
 from app.schemas.common import DashboardResponse
-from app.services.streak_service import StreakService
+from app.services.accountability_service import AccountabilityService
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
@@ -20,12 +20,12 @@ def dashboard(user: CurrentUser, db: DbSession):
     notes = NoteRepository().list(db, user.id, limit=3)
     total = PointRepository().total(db, user.id)
     tomorrow_planned_points = PointRepository().planning_points_for_date(db, user.id, tomorrow)
-    streak = StreakService().recompute(db, user, today)
+    accountability = AccountabilityService().summary(db, user, range_name="today")
     db.commit()
     return DashboardResponse(
         today=today, tomorrow=tomorrow, user_name=user.name, total_points=total,
-        today_completed=sum(todo.status == "completed" for todo in todos), today_total=len(todos),
-        current_streak=streak.current_streak, max_streak=streak.max_streak,
+        today_completed=accountability.completed_count, today_total=accountability.planned_count,
+        current_streak=accountability.current_streak, max_streak=accountability.max_streak,
         todos=todos, unfinished_todos=unfinished, tomorrow_todos=tomorrow_todos,
-        tomorrow_planned_points=tomorrow_planned_points, recent_notes=notes,
+        tomorrow_planned_points=tomorrow_planned_points, recent_notes=notes, accountability=accountability,
     )

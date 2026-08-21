@@ -4,6 +4,7 @@ from pydantic import BaseModel, ConfigDict
 
 from app.schemas.note import NoteResponse
 from app.schemas.todo import TodoResponse
+from app.schemas.accountability import AccountabilityResponse
 
 
 class PointTransactionResponse(BaseModel):
@@ -37,3 +38,4 @@ class DashboardResponse(BaseModel):
     tomorrow_todos: list[TodoResponse]
     tomorrow_planned_points: int
     recent_notes: list[NoteResponse]
+    accountability: AccountabilityResponse

@@ -22,4 +22,4 @@ class User(Base):
     notes = relationship("Note", back_populates="user", cascade="all, delete-orphan")
     point_transactions = relationship("PointTransaction", back_populates="user", cascade="all, delete-orphan")
     streak = relationship("Streak", back_populates="user", uselist=False, cascade="all, delete-orphan")
-
+    daily_reviews = relationship("DailyReview", back_populates="user", cascade="all, delete-orphan")

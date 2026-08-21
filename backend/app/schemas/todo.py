@@ -51,22 +51,34 @@ class TodoResponse(BaseModel):
     completed_at: datetime | None
     missed_at: datetime | None
     miss_reason: str | None
+    miss_reason_code: str | None
+    miss_reason_text: str | None
     carried_from_date: date | None
     carry_forward_count: int
     carry_forward_bonus_awarded: bool
 
 
 class MissTodoRequest(BaseModel):
-    reason: str = Field(min_length=1, max_length=500)
+    reason: str | None = Field(default=None, max_length=500)
+    reason_code: str | None = Field(default=None, max_length=40)
+    reason_text: str | None = Field(default=None, max_length=500)
 
     @model_validator(mode="after")
     def clean_reason(self):
-        self.reason = self.reason.strip()
-        if not self.reason:
+        if self.reason:
+            self.reason = self.reason.strip()
+        if self.reason_text:
+            self.reason_text = self.reason_text.strip()
+        if self.reason_code == "other":
+            self.reason = self.reason_text or self.reason
+        elif not self.reason and self.reason_code:
+            from app.core.accountability import miss_reason_label
+
+            self.reason = miss_reason_label(self.reason_code)
+        if not self.reason or not self.reason.strip():
             raise ValueError("A reason is required")
         return self
 
 
 class CarryForwardRequest(BaseModel):
     todo_ids: list[str] = Field(min_length=1, max_length=100)
-

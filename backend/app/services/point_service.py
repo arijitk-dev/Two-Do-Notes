@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.point_transaction import PointTransaction
@@ -31,6 +32,20 @@ class PointService:
             points=points,
             description=description,
         )
-        db.add(transaction)
-        db.flush()
+        try:
+            # The unique ledger constraint is the final protection for duplicate
+            # requests. A savepoint lets the caller keep its surrounding Todo
+            # transition intact when a concurrent request wins the race.
+            with db.begin_nested():
+                db.add(transaction)
+                db.flush()
+        except IntegrityError:
+            existing = db.scalar(select(PointTransaction).where(
+                PointTransaction.user_id == user.id,
+                PointTransaction.todo_id == todo_id,
+                PointTransaction.transaction_type == transaction_type,
+            ))
+            if existing:
+                return existing
+            raise
         return transaction

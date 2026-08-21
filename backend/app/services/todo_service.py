@@ -2,6 +2,13 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.time import utc_now, user_today
+from app.core.accountability import (
+    CARRY_FORWARD_BONUS,
+    MISS_REASON_LABELS,
+    MISSED_TODO_PENALTY,
+    TODO_COMPLETION_POINTS,
+    miss_reason_label,
+)
 from app.models.point_transaction import TransactionType
 from app.models.todo import Todo, TodoStatus
 from app.models.user import User
@@ -71,12 +78,12 @@ class TodoService:
         todo.completed_at = utc_now()
         self.points.award_once(
             self.db, user, todo.id, TransactionType.TODO_COMPLETED.value,
-            3, "Completed today's Todo",
+            TODO_COMPLETION_POINTS, "Completed today's Todo",
         )
         if todo.carry_forward_count > 0 and not todo.carry_forward_bonus_awarded:
             self.points.award_once(
                 self.db, user, todo.id, TransactionType.CARRY_FORWARD_BONUS.value,
-                1, "Carry-forward completion bonus",
+                CARRY_FORWARD_BONUS, "Carry-forward completion bonus",
             )
             todo.carry_forward_bonus_awarded = True
         self.streaks.recompute(self.db, user, today)
@@ -84,7 +91,7 @@ class TodoService:
         self.db.refresh(todo)
         return todo
 
-    def miss(self, user: User, todo_id: str, reason: str) -> Todo:
+    def miss(self, user: User, todo_id: str, reason: str, reason_code: str | None = None, reason_text: str | None = None) -> Todo:
         todo = self.repository.get_for_update(self.db, user.id, todo_id)
         if not todo:
             raise HTTPException(status_code=404, detail="Todo not found")
@@ -95,12 +102,21 @@ class TodoService:
             return todo
         if todo.status != TodoStatus.PENDING.value:
             raise HTTPException(status_code=400, detail="Only pending Todos can be missed")
+        normalized_code = reason_code if reason_code in MISS_REASON_LABELS else None
+        if normalized_code is None:
+            normalized_code = next(
+                (code for code, label in MISS_REASON_LABELS.items() if label.lower() == reason.strip().lower()),
+                "other",
+            )
+        display_reason = reason_text.strip() if normalized_code == "other" and reason_text else miss_reason_label(normalized_code, reason.strip())
         todo.status = TodoStatus.MISSED.value
         todo.missed_at = utc_now()
-        todo.miss_reason = reason.strip()
+        todo.miss_reason = display_reason
+        todo.miss_reason_code = normalized_code
+        todo.miss_reason_text = reason_text.strip() if reason_text else None
         self.points.award_once(
             self.db, user, todo.id, TransactionType.TODO_MISSED.value,
-            -7, f"Missed Todo: {reason.strip()}",
+            MISSED_TODO_PENALTY, f"Missed Todo: {display_reason}",
         )
         self.streaks.recompute(self.db, user, today)
         self.db.commit()

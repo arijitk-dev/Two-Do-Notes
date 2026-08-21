@@ -31,6 +31,9 @@ Important rules:
 - Business logic belongs in services, not API routes.
 - Users may only access their own data.
 - Date calculations must respect the user's timezone.
+- A successful day requires every planned Todo to be resolved and at least 80% completed; zero-Todo days are neutral.
+- Daily Reviews are optional reflection records and never affect points.
+- Accountability metrics derive from canonical Todo and point-ledger data; do not store duplicate aggregates.
 - Tests are required for business-rule changes.
 - Do not introduce unnecessary infrastructure.
 - Do not implement future-phase features without explicit approval.

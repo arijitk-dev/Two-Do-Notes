@@ -40,6 +40,8 @@ class Todo(Base):
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     missed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     miss_reason: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    miss_reason_code: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    miss_reason_text: Mapped[str | None] = mapped_column(String(500), nullable=True)
     carried_from_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     carry_forward_count: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     carry_forward_bonus_awarded: Mapped[bool] = mapped_column(Boolean, default=False, server_default="0")

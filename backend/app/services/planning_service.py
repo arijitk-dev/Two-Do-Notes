@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.core.time import user_tomorrow
+from app.core.accountability import TOMORROW_PLANNING_POINTS
 from app.models.point_transaction import TransactionType
 from app.models.todo import Todo
 from app.models.user import User
@@ -15,6 +16,5 @@ class PlanningService:
         if todo.scheduled_date == user_tomorrow(user.timezone):
             self.points.award_once(
                 db, user, todo.id, TransactionType.TODO_PLANNED_TOMORROW.value,
-                2, "Planned Todo for tomorrow",
+                TOMORROW_PLANNING_POINTS, "Planned Todo for tomorrow",
             )
-
