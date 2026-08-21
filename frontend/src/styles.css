@@ -40,3 +40,21 @@ nav { margin-top:68px; display:grid; gap:7px; } nav a { color:var(--muted); padd
 @media (max-width:850px) { .review-layout { grid-template-columns:1fr; } .review-stats { grid-template-columns:repeat(2,1fr); } }
 @media (max-width:600px) { .calendar-day { min-height:56px; padding:6px; } .calendar-empty { min-height:56px; } .calendar-indicators { margin-top:9px; } .toast { left:16px; right:16px; bottom:80px; } .mini-metrics { grid-template-columns:1fr 1fr 1fr; } .range-tabs { width:100%; } .range-tabs .button { flex:1; padding:8px 6px; } .review-nav { width:100%; justify-content:space-between; } }
 @media (max-width:850px) { nav a:nth-child(3)::before { content:'▦'; } nav a:nth-child(4)::before { content:'↺'; } nav a:nth-child(5)::before { content:'◌'; } nav a:nth-child(6)::before { content:'▤'; } nav a:nth-child(7)::before { content:'⚙'; font-size:18px; } }
+.history-groups { display:grid; gap:16px; max-width:900px; }
+.history-todo-row { display:grid; grid-template-columns:auto minmax(0,1fr) auto auto; gap:12px; align-items:center; padding:13px 0; border-top:1px solid var(--line); }
+.history-todo-row > input { width:16px; height:16px; accent-color:var(--green); }
+.history-todo-row .todo-meta { margin:0; }
+.history-bulk { display:flex; align-items:center; justify-content:space-between; gap:12px; max-width:900px; padding:12px 14px; margin-bottom:12px; border-radius:9px; background:#e8f1e9; color:var(--green); font-size:12px; font-weight:700; }
+.success-box { max-width:900px; padding:10px 12px; margin-bottom:12px; border-radius:7px; background:#e8f1e9; color:var(--green); font-size:12px; }
+@media (max-width:600px) { .toolbar { flex-wrap:wrap; align-items:center; } .history-todo-row { grid-template-columns:auto minmax(0,1fr) auto; } .history-todo-row .todo-meta { grid-column:2; } .history-todo-row .button { grid-column:3; grid-row:1 / span 2; } }
+.todo-date-toolbar { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+.todo-date-group { display:flex; align-items:center; gap:10px; min-width:0; }
+.todo-date-picker { position:relative; display:flex; align-items:center; min-width:154px; padding:9px 12px; border:1px solid var(--line); border-radius:8px; background:var(--paper); color:var(--ink); font-size:12px; font-weight:700; cursor:pointer; }
+.todo-date-picker span { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.todo-date-picker input { position:absolute; inset:0; width:100%; height:100%; padding:0; border:0; opacity:0; cursor:pointer; }
+.todo-date-picker:focus-within { border-color:#9db29d; box-shadow:0 0 0 3px #e9f0e8; }
+.today-button { white-space:nowrap; }
+.today-button.current { padding:7px 10px; border-radius:7px; background:#e3e9df; color:var(--green); }
+.todo-nav-separator { width:1px; height:22px; background:var(--line); }
+.todo-history-link { white-space:nowrap; }
+@media (max-width:600px) { .todo-date-toolbar { flex-wrap:wrap; gap:10px; } .todo-date-group { display:grid; grid-template-columns:auto minmax(0,1fr) auto auto; width:100%; gap:8px; } .todo-date-picker { min-width:0; } .todo-nav-separator { width:100%; height:1px; } .todo-history-link { margin-left:0; } }

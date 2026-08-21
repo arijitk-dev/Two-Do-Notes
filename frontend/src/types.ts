@@ -1,7 +1,7 @@
 export type TodoStatus = "pending" | "completed" | "missed";
 export type MissReasonCode = "not_enough_time" | "unexpected_work" | "lost_focus" | "too_difficult" | "poor_planning" | "other";
 export type Priority = "low" | "medium" | "high";
-export type Todo = { id: string; title: string; description?: string | null; scheduled_date: string; original_scheduled_date?: string | null; priority: Priority; status: TodoStatus; created_at: string; updated_at: string; completed_at?: string | null; missed_at?: string | null; miss_reason?: string | null; miss_reason_code?: string | null; miss_reason_text?: string | null; carried_from_date?: string | null; carry_forward_count: number; carry_forward_bonus_awarded: boolean };
+export type Todo = { id: string; title: string; description?: string | null; scheduled_date: string; original_scheduled_date?: string | null; priority: Priority; status: TodoStatus; created_at: string; updated_at: string; completed_at?: string | null; missed_at?: string | null; miss_reason?: string | null; miss_reason_code?: string | null; miss_reason_text?: string | null; carried_from_date?: string | null; carry_forward_count: number; carry_forward_bonus_awarded: boolean; source_todo_id?: string | null };
 export type Note = { id: string; title: string; content: string; created_at: string; updated_at: string };
 export type User = { id: string; name: string; email: string; timezone: string };
 export type PointBreakdown = { completed_points: number; planning_points: number; carry_forward_bonus_points: number; missed_points: number; points_earned: number; points_lost: number; net_points: number };

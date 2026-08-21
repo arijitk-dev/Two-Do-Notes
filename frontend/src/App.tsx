@@ -1,24 +1,158 @@
 import { useState, type ReactNode } from "react";
-import { Link as RouterLink, Navigate, Route, Routes, useNavigate, useParams } from "react-router-dom";
+import {
+  Link as RouterLink,
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "./api";
-import { AccountabilityMessage, CalendarView, CarryForwardDialog, DailyReviewForm, EmptyState, ErrorState, NoteCard, Spinner, StatCard, Toast, TodoCard } from "./components";
+import {
+  AccountabilityMessage,
+  CalendarView,
+  CarryForwardDialog,
+  DailyReviewForm,
+  EmptyState,
+  ErrorState,
+  NoteCard,
+  Spinner,
+  StatCard,
+  Toast,
+  TodoCard,
+} from "./components";
 import Layout from "./layout";
 import type { Note, Priority, Todo } from "./types";
 
-function Protected({ children }: { children: ReactNode }) { return localStorage.getItem("two-do-token") ? <>{children}</> : <Navigate to="/login" replace />; }
+function Protected({ children }: { children: ReactNode }) {
+  return localStorage.getItem("two-do-token") ? (
+    <>{children}</>
+  ) : (
+    <Navigate to="/login" replace />
+  );
+}
 
 function AuthPage({ register = false }: { register?: boolean }) {
-  const navigate = useNavigate(); const [form, setForm] = useState({ name: "", email: "", password: "" }); const [error, setError] = useState("");
-  const mutation = useMutation({ mutationFn: () => register ? api.register(form) : api.login({ email: form.email, password: form.password }), onSuccess: result => { localStorage.setItem("two-do-token", result.access_token); localStorage.setItem("two-do-user", JSON.stringify(result.user)); navigate("/dashboard"); }, onError: e => setError((e as Error).message) });
-  return <div className="auth-page"><div className="auth-card"><LinkBrand /><div className="eyebrow">{register ? "START HONESTLY" : "WELCOME BACK"}</div><h1>{register ? "Build a better daily rhythm." : "Back to the work."}</h1><p className="muted">{register ? "A calm place to plan, do, and be accountable." : "Pick up where you left off."}</p><form onSubmit={e => { e.preventDefault(); setError(""); mutation.mutate(); }}>{register && <label>Your name<input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="What should we call you?" /></label>}<label>Email<input required type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" /></label><label>Password<input required minLength={8} type="password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="At least 8 characters" /></label>{error && <ErrorState message={error} />}<button className="button primary full" disabled={mutation.isPending}>{mutation.isPending ? "Working…" : register ? "Create account" : "Sign in"}</button></form><p className="auth-switch">{register ? "Already have an account?" : "New here?"} <RouterLink to={register ? "/login" : "/register"}>{register ? "Sign in" : "Create an account"}</RouterLink></p></div></div>;
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [error, setError] = useState("");
+  const mutation = useMutation({
+    mutationFn: () =>
+      register
+        ? api.register(form)
+        : api.login({ email: form.email, password: form.password }),
+    onSuccess: (result) => {
+      localStorage.setItem("two-do-token", result.access_token);
+      localStorage.setItem("two-do-user", JSON.stringify(result.user));
+      navigate("/dashboard");
+    },
+    onError: (e) => setError((e as Error).message),
+  });
+  return (
+    <div className="auth-page">
+      <div className="auth-card">
+        <LinkBrand />
+        <div className="eyebrow">
+          {register ? "START HONESTLY" : "WELCOME BACK"}
+        </div>
+        <h1>
+          {register ? "Build a better daily rhythm." : "Back to the work."}
+        </h1>
+        <p className="muted">
+          {register
+            ? "A calm place to plan, do, and be accountable."
+            : "Pick up where you left off."}
+        </p>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setError("");
+            mutation.mutate();
+          }}
+        >
+          {register && (
+            <label>
+              Your name
+              <input
+                required
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="What should we call you?"
+              />
+            </label>
+          )}
+          <label>
+            Email
+            <input
+              required
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="you@example.com"
+            />
+          </label>
+          <label>
+            Password
+            <input
+              required
+              minLength={8}
+              type="password"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              placeholder="At least 8 characters"
+            />
+          </label>
+          {error && <ErrorState message={error} />}
+          <button className="button primary full" disabled={mutation.isPending}>
+            {mutation.isPending
+              ? "Working…"
+              : register
+                ? "Create account"
+                : "Sign in"}
+          </button>
+        </form>
+        <p className="auth-switch">
+          {register ? "Already have an account?" : "New here?"}{" "}
+          <RouterLink to={register ? "/login" : "/register"}>
+            {register ? "Sign in" : "Create an account"}
+          </RouterLink>
+        </p>
+      </div>
+    </div>
+  );
 }
-function LinkBrand() { return <RouterLink to="/login" className="brand auth-brand"><span className="brand-mark">2</span><span>Two Do<br/><em>Notes</em></span></RouterLink>; }
+function LinkBrand() {
+  return (
+    <RouterLink to="/login" className="brand auth-brand">
+      <span className="brand-mark">2</span>
+      <span>
+        Two Do
+        <br />
+        <em>Notes</em>
+      </span>
+    </RouterLink>
+  );
+}
 
-function todayForTimezone(timezone: string) {
-  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
-  const values = Object.fromEntries(parts.filter(part => part.type !== "literal").map(part => [part.type, part.value]));
+export function todayForTimezone(timezone: string) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(
+    parts
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value]),
+  );
   return `${values.year}-${values.month}-${values.day}`;
+}
+
+export function todoDateFromSearch(search: string, timezone: string) {
+  return new URLSearchParams(search).get("date") || todayForTimezone(timezone);
 }
 
 function addCalendarDays(dateString: string, days: number) {
@@ -27,53 +161,957 @@ function addCalendarDays(dateString: string, days: number) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
+function formatTodoDate(dateString: string) {
+  return new Date(`${dateString}T12:00:00`).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 function DashboardPage() {
-  const queryClient = useQueryClient(); const dashboard = useQuery({ queryKey: ["dashboard"], queryFn: api.dashboard }); const history = useQuery({ queryKey: ["history"], queryFn: api.history });
-  const [editing, setEditing] = useState<Todo | null>(null); const [showCarry, setShowCarry] = useState(false); const [toast, setToast] = useState("");
-  const refresh = () => { queryClient.invalidateQueries({ queryKey: ["dashboard"] }); queryClient.invalidateQueries({ queryKey: ["history"] }); queryClient.invalidateQueries({ queryKey: ["todos"] }); queryClient.invalidateQueries({ queryKey: ["calendar"] }); };
-  const complete = useMutation({ mutationFn: api.completeTodo, onSuccess: refresh });
+  const queryClient = useQueryClient();
+  const dashboard = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: api.dashboard,
+  });
+  const history = useQuery({ queryKey: ["history"], queryFn: api.history });
+  const [editing, setEditing] = useState<Todo | null>(null);
+  const [showCarry, setShowCarry] = useState(false);
+  const [toast, setToast] = useState("");
+  const refresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    queryClient.invalidateQueries({ queryKey: ["history"] });
+    queryClient.invalidateQueries({ queryKey: ["todos"] });
+    queryClient.invalidateQueries({ queryKey: ["calendar"] });
+  };
+  const complete = useMutation({
+    mutationFn: api.completeTodo,
+    onSuccess: refresh,
+  });
   const del = useMutation({ mutationFn: api.deleteTodo, onSuccess: refresh });
-  const missed = useMutation({ mutationFn: ({ id, reason, reasonCode, reasonText }: { id: string; reason: string; reasonCode?: string; reasonText?: string }) => api.missTodo(id, reason, reasonCode, reasonText), onSuccess: refresh });
-  const carry = useMutation({ mutationFn: api.carryForward, onSuccess: () => { refresh(); setShowCarry(false); setToast("Selected Todos moved to tomorrow. No points were awarded for moving them."); } });
-  if (dashboard.isLoading) return <Spinner />; if (dashboard.isError) return <ErrorState message={(dashboard.error as Error).message} />; const data = dashboard.data!;
-  return <><PageHeader eyebrow="YOUR DAY" title={`Good to see you, ${data.user_name.split(" ")[0]}.`} description="Plan honestly. Do what you planned. Be accountable when you don't." /><div className="stats-grid"><StatCard label="Today's progress" value={`${data.today_completed} / ${data.today_total}`} accent="green" /><StatCard label="Current streak" value={`${data.current_streak} days`} /><StatCard label="Best streak" value={`${data.max_streak} days`} /><StatCard label="Total points" value={data.total_points} accent="amber" /></div><div className="content-grid"><section className="panel"><div className="panel-heading"><div><div className="eyebrow">{data.today}</div><h2>Today's Todos</h2></div><RouterLink className="text-button" to="/todos">View all →</RouterLink></div>{data.todos.length ? data.todos.map(todo => <TodoCard key={todo.id} todo={todo} onComplete={() => complete.mutate(todo.id)} onMiss={(reason, reasonCode, reasonText) => missed.mutate({ id: todo.id, reason, reasonCode, reasonText })} onEdit={() => setEditing(todo)} onDelete={() => window.confirm("Delete this Todo?") && del.mutate(todo.id)} />) : <EmptyState>No Todos planned for today. Make the first one count.</EmptyState>}</section><aside className="side-stack"><AccountabilityMessage message={data.accountability.accountability_message} /><section className="panel accountability-mini"><div className="panel-heading"><h2>Accountability</h2><RouterLink className="text-button" to="/accountability">Details →</RouterLink></div><div className="mini-metrics"><span><strong>{Math.round(data.accountability.completion_rate * 100)}%</strong>Completion</span><span><strong>{Math.round(data.accountability.planning_accuracy * 100)}%</strong>Planning</span><span><strong>{data.accountability.pending_count}</strong>Need decision</span></div>{data.accountability.pending_count > 0 && <p className="muted">{data.accountability.pending_count} Todo{data.accountability.pending_count === 1 ? "" : "s"} still need a decision.</p>}<RouterLink className="button subtle small" to={`/reviews/${data.today}`}>Review today</RouterLink></section><section className="panel planning-card"><div className="panel-heading"><div><div className="eyebrow">TOMORROW</div><h2>{data.tomorrow_todos.length} planned Todo{data.tomorrow_todos.length === 1 ? "" : "s"}</h2></div><strong className="planning-points">+{data.tomorrow_planned_points}</strong></div><p className="muted">Planning points earned: {data.tomorrow_planned_points}</p>{data.unfinished_todos.length > 0 && <button className="button subtle small" onClick={() => setShowCarry(true)}>Review {data.unfinished_todos.length} unfinished</button>}</section><section className="panel notes-preview"><div className="panel-heading"><h2>Recent notes</h2><RouterLink className="text-button" to="/notes">Open notes →</RouterLink></div>{data.recent_notes.length ? data.recent_notes.map(note => <div className="preview-note" key={note.id}><strong>{note.title}</strong><p>{note.content}</p></div>) : <EmptyState>No notes yet.</EmptyState>}</section><section className="panel history-preview"><div className="panel-heading"><h2>Point history</h2></div>{history.isLoading ? <Spinner /> : history.data?.length ? history.data.map(item => <div className="history-row" key={item.id}><span>{item.description}</span><strong className={item.points > 0 ? "positive" : "negative"}>{item.points > 0 ? `+${item.points}` : item.points}</strong></div>) : <EmptyState>No transactions yet.</EmptyState>}</section></aside></div>{editing && <TodoEditor todo={editing} onClose={() => setEditing(null)} />}{showCarry && <CarryForwardDialog todos={data.unfinished_todos} onMove={ids => carry.mutate(ids)} onKeep={() => setShowCarry(false)} onCancel={() => setShowCarry(false)} />}{toast && <Toast message={toast} onClose={() => setToast("")} />}</>;
+  const missed = useMutation({
+    mutationFn: ({
+      id,
+      reason,
+      reasonCode,
+      reasonText,
+    }: {
+      id: string;
+      reason: string;
+      reasonCode?: string;
+      reasonText?: string;
+    }) => api.missTodo(id, reason, reasonCode, reasonText),
+    onSuccess: refresh,
+  });
+  const carry = useMutation({
+    mutationFn: api.carryForward,
+    onSuccess: () => {
+      refresh();
+      setShowCarry(false);
+      setToast(
+        "Selected Todos moved to tomorrow. No points were awarded for moving them.",
+      );
+    },
+  });
+  if (dashboard.isLoading) return <Spinner />;
+  if (dashboard.isError)
+    return <ErrorState message={(dashboard.error as Error).message} />;
+  const data = dashboard.data!;
+  return (
+    <>
+      <PageHeader
+        eyebrow="YOUR DAY"
+        title={`Good to see you, ${data.user_name.split(" ")[0]}.`}
+        description="Plan honestly. Do what you planned. Be accountable when you don't."
+      />
+      <div className="stats-grid">
+        <StatCard
+          label="Today's progress"
+          value={`${data.today_completed} / ${data.today_total}`}
+          accent="green"
+        />
+        <StatCard
+          label="Current streak"
+          value={`${data.current_streak} days`}
+        />
+        <StatCard label="Best streak" value={`${data.max_streak} days`} />
+        <StatCard
+          label="Total points"
+          value={data.total_points}
+          accent="amber"
+        />
+      </div>
+      <div className="content-grid">
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <div className="eyebrow">{data.today}</div>
+              <h2>Today's Todos</h2>
+            </div>
+            <RouterLink className="text-button" to="/todos">
+              View all →
+            </RouterLink>
+          </div>
+          {data.todos.length ? (
+            data.todos.map((todo) => (
+              <TodoCard
+                key={todo.id}
+                todo={todo}
+                onComplete={() => complete.mutate(todo.id)}
+                onMiss={(reason, reasonCode, reasonText) =>
+                  missed.mutate({ id: todo.id, reason, reasonCode, reasonText })
+                }
+                onEdit={() => setEditing(todo)}
+                onDelete={() =>
+                  window.confirm("Delete this Todo?") && del.mutate(todo.id)
+                }
+              />
+            ))
+          ) : (
+            <EmptyState>
+              No Todos planned for today. Make the first one count.
+            </EmptyState>
+          )}
+        </section>
+        <aside className="side-stack">
+          <AccountabilityMessage
+            message={data.accountability.accountability_message}
+          />
+          <section className="panel accountability-mini">
+            <div className="panel-heading">
+              <h2>Accountability</h2>
+              <RouterLink className="text-button" to="/accountability">
+                Details →
+              </RouterLink>
+            </div>
+            <div className="mini-metrics">
+              <span>
+                <strong>
+                  {Math.round(data.accountability.completion_rate * 100)}%
+                </strong>
+                Completion
+              </span>
+              <span>
+                <strong>
+                  {Math.round(data.accountability.planning_accuracy * 100)}%
+                </strong>
+                Planning
+              </span>
+              <span>
+                <strong>{data.accountability.pending_count}</strong>Need
+                decision
+              </span>
+            </div>
+            {data.accountability.pending_count > 0 && (
+              <p className="muted">
+                {data.accountability.pending_count} Todo
+                {data.accountability.pending_count === 1 ? "" : "s"} still need
+                a decision.
+              </p>
+            )}
+            <RouterLink
+              className="button subtle small"
+              to={`/reviews/${data.today}`}
+            >
+              Review today
+            </RouterLink>
+          </section>
+          <section className="panel planning-card">
+            <div className="panel-heading">
+              <div>
+                <div className="eyebrow">TOMORROW</div>
+                <h2>
+                  {data.tomorrow_todos.length} planned Todo
+                  {data.tomorrow_todos.length === 1 ? "" : "s"}
+                </h2>
+              </div>
+              <strong className="planning-points">
+                +{data.tomorrow_planned_points}
+              </strong>
+            </div>
+            <p className="muted">
+              Planning points earned: {data.tomorrow_planned_points}
+            </p>
+            {data.unfinished_todos.length > 0 && (
+              <button
+                className="button subtle small"
+                onClick={() => setShowCarry(true)}
+              >
+                Review {data.unfinished_todos.length} unfinished
+              </button>
+            )}
+          </section>
+          <section className="panel notes-preview">
+            <div className="panel-heading">
+              <h2>Recent notes</h2>
+              <RouterLink className="text-button" to="/notes">
+                Open notes →
+              </RouterLink>
+            </div>
+            {data.recent_notes.length ? (
+              data.recent_notes.map((note) => (
+                <div className="preview-note" key={note.id}>
+                  <strong>{note.title}</strong>
+                  <p>{note.content}</p>
+                </div>
+              ))
+            ) : (
+              <EmptyState>No notes yet.</EmptyState>
+            )}
+          </section>
+          <section className="panel history-preview">
+            <div className="panel-heading">
+              <h2>Point history</h2>
+            </div>
+            {history.isLoading ? (
+              <Spinner />
+            ) : history.data?.length ? (
+              history.data.map((item) => (
+                <div className="history-row" key={item.id}>
+                  <span>{item.description}</span>
+                  <strong className={item.points > 0 ? "positive" : "negative"}>
+                    {item.points > 0 ? `+${item.points}` : item.points}
+                  </strong>
+                </div>
+              ))
+            ) : (
+              <EmptyState>No transactions yet.</EmptyState>
+            )}
+          </section>
+        </aside>
+      </div>
+      {editing && (
+        <TodoEditor todo={editing} onClose={() => setEditing(null)} />
+      )}
+      {showCarry && (
+        <CarryForwardDialog
+          todos={data.unfinished_todos}
+          onMove={(ids) => carry.mutate(ids)}
+          onKeep={() => setShowCarry(false)}
+          onCancel={() => setShowCarry(false)}
+        />
+      )}
+      {toast && <Toast message={toast} onClose={() => setToast("")} />}
+    </>
+  );
 }
 
 function CalendarPage() {
   const queryClient = useQueryClient();
   const user = JSON.parse(localStorage.getItem("two-do-user") || "null");
   const initialDate = todayForTimezone(user?.timezone || "Asia/Kolkata");
-  const [cursor, setCursor] = useState(() => new Date(`${initialDate}T12:00:00`));
+  const [cursor, setCursor] = useState(
+    () => new Date(`${initialDate}T12:00:00`),
+  );
   const [selectedDate, setSelectedDate] = useState(initialDate);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Todo | null>(null);
   const [toast, setToast] = useState("");
-  const calendar = useQuery({ queryKey: ["calendar", cursor.getFullYear(), cursor.getMonth() + 1], queryFn: () => api.calendar(cursor.getFullYear(), cursor.getMonth() + 1) });
-  const todos = useQuery({ queryKey: ["todos", selectedDate], queryFn: () => api.todos(selectedDate) });
-  const invalidate = () => { queryClient.invalidateQueries({ queryKey: ["calendar"] }); queryClient.invalidateQueries({ queryKey: ["todos"] }); queryClient.invalidateQueries({ queryKey: ["dashboard"] }); queryClient.invalidateQueries({ queryKey: ["history"] }); };
-  const complete = useMutation({ mutationFn: api.completeTodo, onSuccess: invalidate });
-  const del = useMutation({ mutationFn: api.deleteTodo, onSuccess: invalidate });
-  const moveMonth = (delta: number) => { const next = new Date(cursor.getFullYear(), cursor.getMonth() + delta, 1); setCursor(next); setSelectedDate(`${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, "0")}-01`); };
-  const selectedLabel = new Date(`${selectedDate}T12:00:00`).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
-  return <><PageHeader eyebrow="TIME AWARE PLANNING" title="Calendar" description="See the shape of your work, one day at a time." action={<button className="button primary" onClick={() => { setEditing(null); setShowForm(true); }}>+ Add Todo</button>} /><div className="calendar-layout"><section className="panel calendar-panel"><div className="calendar-header"><button className="text-button" onClick={() => moveMonth(-1)}>← Prev</button><h2>{cursor.toLocaleDateString(undefined, { month: "long", year: "numeric" })}</h2><button className="text-button" onClick={() => moveMonth(1)}>Next →</button></div>{calendar.isLoading ? <Spinner /> : calendar.isError ? <ErrorState message={(calendar.error as Error).message} /> : <CalendarView calendar={calendar.data!} selectedDate={selectedDate} onSelect={setSelectedDate} />}</section><section className="panel selected-day"><div className="panel-heading"><div><div className="eyebrow">SELECTED DATE</div><h2>{selectedLabel}</h2></div><button className="button subtle small" onClick={() => { setEditing(null); setShowForm(true); }}>+ Add</button></div>{todos.isLoading ? <Spinner /> : todos.isError ? <ErrorState message={(todos.error as Error).message} /> : todos.data!.length ? todos.data!.map(todo => <TodoCard key={todo.id} todo={todo} canComplete={todo.scheduled_date === todayForTimezone(user?.timezone || "Asia/Kolkata")} canMiss={todo.scheduled_date === todayForTimezone(user?.timezone || "Asia/Kolkata")} onComplete={() => complete.mutate(todo.id)} onMiss={() => setToast("Miss is available from today's view.")} onEdit={() => { setEditing(todo); setShowForm(true); }} onDelete={() => window.confirm("Delete this Todo?") && del.mutate(todo.id)} />) : <EmptyState>No Todos planned for this date.</EmptyState>}</section></div>{showForm && <TodoEditor key={`${editing?.id || "new"}-${selectedDate}`} todo={editing} initialDate={selectedDate} onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); invalidate(); setToast(editing ? "Todo updated." : selectedDate === addCalendarDays(initialDate, 1) ? "Tomorrow planned. +2 points." : selectedDate === initialDate ? "Todo planned." : "Todo added to the calendar."); }} />}{toast && <Toast message={toast} onClose={() => setToast("")} />}</>;
+  const calendar = useQuery({
+    queryKey: ["calendar", cursor.getFullYear(), cursor.getMonth() + 1],
+    queryFn: () => api.calendar(cursor.getFullYear(), cursor.getMonth() + 1),
+  });
+  const todos = useQuery({
+    queryKey: ["todos", selectedDate],
+    queryFn: () => api.todos(selectedDate),
+  });
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ["calendar"] });
+    queryClient.invalidateQueries({ queryKey: ["todos"] });
+    queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    queryClient.invalidateQueries({ queryKey: ["history"] });
+  };
+  const complete = useMutation({
+    mutationFn: api.completeTodo,
+    onSuccess: invalidate,
+  });
+  const del = useMutation({
+    mutationFn: api.deleteTodo,
+    onSuccess: invalidate,
+  });
+  const moveMonth = (delta: number) => {
+    const next = new Date(cursor.getFullYear(), cursor.getMonth() + delta, 1);
+    setCursor(next);
+    setSelectedDate(
+      `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, "0")}-01`,
+    );
+  };
+  const selectedLabel = new Date(`${selectedDate}T12:00:00`).toLocaleDateString(
+    undefined,
+    { month: "long", day: "numeric", year: "numeric" },
+  );
+  return (
+    <>
+      <PageHeader
+        eyebrow="TIME AWARE PLANNING"
+        title="Calendar"
+        description="See the shape of your work, one day at a time."
+        action={
+          <button
+            className="button primary"
+            onClick={() => {
+              setEditing(null);
+              setShowForm(true);
+            }}
+          >
+            + Add Todo
+          </button>
+        }
+      />
+      <div className="calendar-layout">
+        <section className="panel calendar-panel">
+          <div className="calendar-header">
+            <button className="text-button" onClick={() => moveMonth(-1)}>
+              ← Prev
+            </button>
+            <h2>
+              {cursor.toLocaleDateString(undefined, {
+                month: "long",
+                year: "numeric",
+              })}
+            </h2>
+            <button className="text-button" onClick={() => moveMonth(1)}>
+              Next →
+            </button>
+          </div>
+          {calendar.isLoading ? (
+            <Spinner />
+          ) : calendar.isError ? (
+            <ErrorState message={(calendar.error as Error).message} />
+          ) : (
+            <CalendarView
+              calendar={calendar.data!}
+              selectedDate={selectedDate}
+              onSelect={setSelectedDate}
+            />
+          )}
+        </section>
+        <section className="panel selected-day">
+          <div className="panel-heading">
+            <div>
+              <div className="eyebrow">SELECTED DATE</div>
+              <h2>{selectedLabel}</h2>
+            </div>
+            <button
+              className="button subtle small"
+              onClick={() => {
+                setEditing(null);
+                setShowForm(true);
+              }}
+            >
+              + Add
+            </button>
+          </div>
+          {todos.isLoading ? (
+            <Spinner />
+          ) : todos.isError ? (
+            <ErrorState message={(todos.error as Error).message} />
+          ) : todos.data!.length ? (
+            todos.data!.map((todo) => (
+              <TodoCard
+                key={todo.id}
+                todo={todo}
+                canComplete={
+                  todo.scheduled_date ===
+                  todayForTimezone(user?.timezone || "Asia/Kolkata")
+                }
+                canMiss={
+                  todo.scheduled_date ===
+                  todayForTimezone(user?.timezone || "Asia/Kolkata")
+                }
+                onComplete={() => complete.mutate(todo.id)}
+                onMiss={() => setToast("Miss is available from today's view.")}
+                onEdit={() => {
+                  setEditing(todo);
+                  setShowForm(true);
+                }}
+                onDelete={() =>
+                  window.confirm("Delete this Todo?") && del.mutate(todo.id)
+                }
+              />
+            ))
+          ) : (
+            <EmptyState>No Todos planned for this date.</EmptyState>
+          )}
+        </section>
+      </div>
+      {showForm && (
+        <TodoEditor
+          key={`${editing?.id || "new"}-${selectedDate}`}
+          todo={editing}
+          initialDate={selectedDate}
+          onClose={() => setShowForm(false)}
+          onSaved={() => {
+            setShowForm(false);
+            invalidate();
+            setToast(
+              editing
+                ? "Todo updated."
+                : selectedDate === addCalendarDays(initialDate, 1)
+                  ? "Tomorrow planned. +2 points."
+                  : selectedDate === initialDate
+                    ? "Todo planned."
+                    : "Todo added to the calendar.",
+            );
+          }}
+        />
+      )}
+      {toast && <Toast message={toast} onClose={() => setToast("")} />}
+    </>
+  );
 }
 
 function TodosPage() {
-  const queryClient = useQueryClient(); const [showForm, setShowForm] = useState(false); const [editing, setEditing] = useState<Todo | null>(null); const [filter, setFilter] = useState(""); const user = JSON.parse(localStorage.getItem("two-do-user") || "null"); const today = todayForTimezone(user?.timezone || "Asia/Kolkata");
-  const todos = useQuery({ queryKey: ["todos", filter], queryFn: () => api.todos(filter || undefined) });
-  const invalidate = () => { queryClient.invalidateQueries({ queryKey: ["todos"] }); queryClient.invalidateQueries({ queryKey: ["dashboard"] }); queryClient.invalidateQueries({ queryKey: ["history"] }); };
-  const complete = useMutation({ mutationFn: api.completeTodo, onSuccess: invalidate }); const del = useMutation({ mutationFn: api.deleteTodo, onSuccess: invalidate }); const missed = useMutation({ mutationFn: ({ id, reason, reasonCode, reasonText }: { id: string; reason: string; reasonCode?: string; reasonText?: string }) => api.missTodo(id, reason, reasonCode, reasonText), onSuccess: invalidate });
-  return <><PageHeader eyebrow="THE PLAN" title="Todos" description="A clear plan makes an honest day easier." action={<button className="button primary" onClick={() => { setEditing(null); setShowForm(true); }}>+ New Todo</button>} /><div className="toolbar"><label className="date-field">Show date <input type="date" value={filter} onChange={e => setFilter(e.target.value)} /></label>{filter && <button className="text-button" onClick={() => setFilter("")}>All dates</button>}</div>{todos.isLoading ? <Spinner /> : todos.isError ? <ErrorState message={(todos.error as Error).message} /> : todos.data!.length ? <div className="todo-list">{todos.data!.map(todo => <TodoCard key={todo.id} todo={todo} canComplete={todo.scheduled_date === today} canMiss={todo.scheduled_date === today} onComplete={() => complete.mutate(todo.id)} onMiss={(reason, reasonCode, reasonText) => missed.mutate({ id: todo.id, reason, reasonCode, reasonText })} onEdit={() => { setEditing(todo); setShowForm(true); }} onDelete={() => window.confirm("Delete this Todo?") && del.mutate(todo.id)} />)}</div> : <EmptyState>No Todos for this date. Add one to begin.</EmptyState>}{showForm && <TodoEditor todo={editing} onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); invalidate(); }} />}</>;
+  const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<Todo | null>(null);
+  const user = JSON.parse(localStorage.getItem("two-do-user") || "null");
+  const timezone = user?.timezone || "Asia/Kolkata";
+  const today = todayForTimezone(timezone);
+  const selectedDate = todoDateFromSearch(searchParams.toString(), timezone);
+  const todos = useQuery({
+    queryKey: ["todos", selectedDate],
+    queryFn: () => api.todos(selectedDate),
+  });
+  const setDate = (date: string) =>
+    setSearchParams(date === today ? {} : { date });
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ["todos"] });
+    queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    queryClient.invalidateQueries({ queryKey: ["history"] });
+  };
+  const complete = useMutation({
+    mutationFn: api.completeTodo,
+    onSuccess: invalidate,
+  });
+  const del = useMutation({
+    mutationFn: api.deleteTodo,
+    onSuccess: invalidate,
+  });
+  const missed = useMutation({
+    mutationFn: ({
+      id,
+      reason,
+      reasonCode,
+      reasonText,
+    }: {
+      id: string;
+      reason: string;
+      reasonCode?: string;
+      reasonText?: string;
+    }) => api.missTodo(id, reason, reasonCode, reasonText),
+    onSuccess: invalidate,
+  });
+  return (
+    <>
+      <PageHeader
+        eyebrow="THE PLAN"
+        title={selectedDate === today ? "Today’s Todos" : "Todos"}
+        description="A clear plan makes an honest day easier."
+        action={
+          <button
+            className="button primary"
+            onClick={() => {
+              setEditing(null);
+              setShowForm(true);
+            }}
+          >
+            + New Todo
+          </button>
+        }
+      />
+      <div className="todo-date-toolbar">
+        <div className="todo-date-group">
+          <button
+            className="text-button"
+            aria-label="Previous date"
+            onClick={() => setDate(addCalendarDays(selectedDate, -1))}
+          >
+            ← Prev
+          </button>
+          <label className="todo-date-picker">
+            <span aria-hidden="true">📅 {formatTodoDate(selectedDate)}</span>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setDate(e.target.value)}
+              aria-label="Choose Todo date"
+            />
+          </label>
+          <button
+            className={`text-button today-button ${selectedDate === today ? "current" : ""}`}
+            aria-label="Go to today"
+            aria-pressed={selectedDate === today}
+            onClick={() => setDate(today)}
+          >
+            Today
+          </button>
+          <button
+            className="text-button"
+            aria-label="Next date"
+            onClick={() => setDate(addCalendarDays(selectedDate, 1))}
+          >
+            Next →
+          </button>
+        </div>
+        <span className="todo-nav-separator" aria-hidden="true" />
+        <RouterLink
+          className="text-button todo-history-link"
+          to="/todos/history"
+        >
+          ↻ History &amp; Reuse
+        </RouterLink>
+      </div>
+      {todos.isLoading ? (
+        <Spinner />
+      ) : todos.isError ? (
+        <ErrorState message={(todos.error as Error).message} />
+      ) : todos.data!.length ? (
+        <div className="todo-list">
+          {todos.data!.map((todo) => (
+            <TodoCard
+              key={todo.id}
+              todo={todo}
+              canComplete={todo.scheduled_date === today}
+              canMiss={todo.scheduled_date === today}
+              onComplete={() => complete.mutate(todo.id)}
+              onMiss={(reason, reasonCode, reasonText) =>
+                missed.mutate({ id: todo.id, reason, reasonCode, reasonText })
+              }
+              onEdit={() => {
+                setEditing(todo);
+                setShowForm(true);
+              }}
+              onDelete={() =>
+                window.confirm("Delete this Todo?") && del.mutate(todo.id)
+              }
+            />
+          ))}
+        </div>
+      ) : (
+        <EmptyState>No Todos for this date. Add one to begin.</EmptyState>
+      )}
+      {showForm && (
+        <TodoEditor
+          todo={editing}
+          initialDate={selectedDate}
+          onClose={() => setShowForm(false)}
+          onSaved={() => {
+            setShowForm(false);
+            invalidate();
+          }}
+        />
+      )}
+    </>
+  );
 }
 
-function TodoEditor({ todo, initialDate, onClose, onSaved }: { todo: Todo | null; initialDate?: string; onClose: () => void; onSaved?: () => void }) {
-  const queryClient = useQueryClient(); const [form, setForm] = useState<{ title: string; description: string; scheduled_date: string; priority: Priority }>({ title: todo?.title || "", description: todo?.description || "", scheduled_date: todo?.scheduled_date || initialDate || new Date().toISOString().slice(0, 10), priority: todo?.priority || "medium" }); const [error, setError] = useState("");
-  const save = useMutation({ mutationFn: () => todo ? api.updateTodo(todo.id, form) : api.createTodo(form), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["todos"] }); queryClient.invalidateQueries({ queryKey: ["dashboard"] }); queryClient.invalidateQueries({ queryKey: ["history"] }); onSaved?.(); onClose(); }, onError: e => setError((e as Error).message) });
-  return <div className="modal-backdrop"><div className="modal"><div className="modal-heading"><div><div className="eyebrow">{todo ? "REFINE THE PLAN" : "ADD TO THE PLAN"}</div><h2>{todo ? "Edit Todo" : "New Todo"}</h2></div><button className="close-button" onClick={onClose}>×</button></div><form onSubmit={e => { e.preventDefault(); save.mutate(); }}><label>Title<input autoFocus required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} /></label><label>Description<textarea rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></label><div className="form-row"><label>Scheduled date<input required type="date" value={form.scheduled_date} onChange={e => setForm({ ...form, scheduled_date: e.target.value })} /></label><label>Priority<select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value as Priority })}><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label></div>{error && <ErrorState message={error} />}<div className="modal-actions"><button type="button" className="button subtle" onClick={onClose}>Cancel</button><button className="button primary" disabled={save.isPending}>Save Todo</button></div></form></div></div>;
+function TodosHistoryPage() {
+  const queryClient = useQueryClient();
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<string[]>([]);
+  const [message, setMessage] = useState("");
+  const history = useQuery({
+    queryKey: ["todo-history", search],
+    queryFn: () => api.todoHistory(search || undefined),
+  });
+  const refresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["todo-history"] });
+    queryClient.invalidateQueries({ queryKey: ["todos"] });
+    queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    setSelected([]);
+  };
+  const reuse = useMutation({
+    mutationFn: api.reuseTodo,
+    onSuccess: (todo) => {
+      refresh();
+      setMessage(`“${todo.title}” added to today.`);
+    },
+    onError: (error) => setMessage((error as Error).message),
+  });
+  const reuseMany = useMutation({
+    mutationFn: api.reuseTodos,
+    onSuccess: (todos) => {
+      refresh();
+      setMessage(
+        todos.length
+          ? `${todos.length} Todo${todos.length === 1 ? "" : "s"} added to today.`
+          : "Selected Todos are already on today’s list.",
+      );
+    },
+    onError: (error) => setMessage((error as Error).message),
+  });
+  const groups = (history.data || []).reduce<Record<string, Todo[]>>(
+    (result, todo) => {
+      (result[todo.scheduled_date] ||= []).push(todo);
+      return result;
+    },
+    {},
+  );
+  const toggle = (id: string) =>
+    setSelected((current) =>
+      current.includes(id)
+        ? current.filter((value) => value !== id)
+        : [...current, id],
+    );
+  return (
+    <>
+      <PageHeader
+        eyebrow="LOOK BACK, MOVE FORWARD"
+        title="Todo history"
+        description="Reuse a recent Todo when it still belongs on today’s honest plan."
+        action={
+          <RouterLink className="button subtle" to="/todos">
+            Today’s Todos
+          </RouterLink>
+        }
+      />
+      <div className="search-bar">
+        <input
+          placeholder="Search recent Todos…"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+      </div>
+      {selected.length > 0 && (
+        <div className="history-bulk">
+          <span>{selected.length} selected</span>
+          <button
+            className="button primary small"
+            disabled={reuseMany.isPending}
+            onClick={() => reuseMany.mutate(selected)}
+          >
+            Add selected to today
+          </button>
+        </div>
+      )}
+      {message && (
+        <div className="success-box" role="status">
+          {message}
+        </div>
+      )}
+      {history.isLoading ? (
+        <Spinner />
+      ) : history.isError ? (
+        <ErrorState message={(history.error as Error).message} />
+      ) : Object.keys(groups).length === 0 ? (
+        <EmptyState>No recent Todo history yet.</EmptyState>
+      ) : (
+        <div className="history-groups">
+          {Object.entries(groups).map(([date, todos]) => (
+            <section className="panel" key={date}>
+              <div className="panel-heading">
+                <div>
+                  <div className="eyebrow">
+                    {new Date(`${date}T12:00:00`).toLocaleDateString(
+                      undefined,
+                      { weekday: "long" },
+                    )}
+                  </div>
+                  <h2>
+                    {new Date(`${date}T12:00:00`).toLocaleDateString(
+                      undefined,
+                      { month: "long", day: "numeric", year: "numeric" },
+                    )}
+                  </h2>
+                </div>
+              </div>
+              {todos.map((todo) => (
+                <article className="history-todo-row" key={todo.id}>
+                  <input
+                    aria-label={`Select ${todo.title}`}
+                    type="checkbox"
+                    checked={selected.includes(todo.id)}
+                    onChange={() => toggle(todo.id)}
+                  />
+                  <div className="todo-main">
+                    <span className={`priority-dot ${todo.priority}`} />
+                    <div>
+                      <h3>{todo.title}</h3>
+                      {todo.description && <p>{todo.description}</p>}
+                    </div>
+                  </div>
+                  <div className="todo-meta">
+                    <span className={`badge ${todo.status}`}>
+                      {todo.status}
+                    </span>
+                    <span className={`priority ${todo.priority}`}>
+                      {todo.priority} priority
+                    </span>
+                  </div>
+                  <button
+                    className="button subtle small"
+                    disabled={reuse.isPending}
+                    onClick={() => reuse.mutate(todo.id)}
+                  >
+                    + Today
+                  </button>
+                </article>
+              ))}
+            </section>
+          ))}
+        </div>
+      )}
+    </>
+  );
 }
 
-function NotesPage() { const queryClient = useQueryClient(); const [search, setSearch] = useState(""); const [editing, setEditing] = useState<Note | null>(null); const [show, setShow] = useState(false); const notes = useQuery({ queryKey: ["notes", search], queryFn: () => api.notes(search || undefined) }); const del = useMutation({ mutationFn: api.deleteNote, onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notes"] }) }); return <><PageHeader eyebrow="THOUGHTS & REFLECTIONS" title="Notes" description="Keep the context that helps you do the work." action={<button className="button primary" onClick={() => { setEditing(null); setShow(true); }}>+ New note</button>} /><div className="search-bar"><input placeholder="Search notes…" value={search} onChange={e => setSearch(e.target.value)} /></div>{notes.isLoading ? <Spinner /> : notes.isError ? <ErrorState message={(notes.error as Error).message} /> : notes.data!.length ? <div className="notes-grid">{notes.data!.map(note => <NoteCard key={note.id} note={note} onEdit={() => { setEditing(note); setShow(true); }} onDelete={() => window.confirm("Delete this note?") && del.mutate(note.id)} />)}</div> : <EmptyState>No notes found. Write something down.</EmptyState>}{show && <NoteEditor note={editing} onClose={() => setShow(false)} />}</>; }
-function NoteEditor({ note, onClose }: { note: Note | null; onClose: () => void }) { const queryClient = useQueryClient(); const [title, setTitle] = useState(note?.title || ""); const [content, setContent] = useState(note?.content || ""); const save = useMutation({ mutationFn: () => note ? api.updateNote(note.id, { title, content }) : api.createNote({ title, content }), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["notes"] }); queryClient.invalidateQueries({ queryKey: ["dashboard"] }); onClose(); } }); return <div className="modal-backdrop"><div className="modal"><div className="modal-heading"><div><div className="eyebrow">MAKE SPACE</div><h2>{note ? "Edit note" : "New note"}</h2></div><button className="close-button" onClick={onClose}>×</button></div><form onSubmit={e => { e.preventDefault(); save.mutate(); }}><label>Title<input autoFocus required value={title} onChange={e => setTitle(e.target.value)} /></label><label>Content<textarea required rows={8} value={content} onChange={e => setContent(e.target.value)} /></label><div className="modal-actions"><button type="button" className="button subtle" onClick={onClose}>Cancel</button><button className="button primary" disabled={save.isPending}>Save note</button></div></form></div></div>; }
+function TodoEditor({
+  todo,
+  initialDate,
+  onClose,
+  onSaved,
+}: {
+  todo: Todo | null;
+  initialDate?: string;
+  onClose: () => void;
+  onSaved?: () => void;
+}) {
+  const queryClient = useQueryClient();
+  const [form, setForm] = useState<{
+    title: string;
+    description: string;
+    scheduled_date: string;
+    priority: Priority;
+  }>({
+    title: todo?.title || "",
+    description: todo?.description || "",
+    scheduled_date:
+      todo?.scheduled_date ||
+      initialDate ||
+      new Date().toISOString().slice(0, 10),
+    priority: todo?.priority || "medium",
+  });
+  const [error, setError] = useState("");
+  const save = useMutation({
+    mutationFn: () =>
+      todo ? api.updateTodo(todo.id, form) : api.createTodo(form),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["history"] });
+      onSaved?.();
+      onClose();
+    },
+    onError: (e) => setError((e as Error).message),
+  });
+  return (
+    <div className="modal-backdrop">
+      <div className="modal">
+        <div className="modal-heading">
+          <div>
+            <div className="eyebrow">
+              {todo ? "REFINE THE PLAN" : "ADD TO THE PLAN"}
+            </div>
+            <h2>{todo ? "Edit Todo" : "New Todo"}</h2>
+          </div>
+          <button className="close-button" onClick={onClose}>
+            ×
+          </button>
+        </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            save.mutate();
+          }}
+        >
+          <label>
+            Title
+            <input
+              autoFocus
+              required
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+            />
+          </label>
+          <label>
+            Description
+            <textarea
+              rows={3}
+              value={form.description}
+              onChange={(e) =>
+                setForm({ ...form, description: e.target.value })
+              }
+            />
+          </label>
+          <div className="form-row">
+            <label>
+              Scheduled date
+              <input
+                required
+                type="date"
+                value={form.scheduled_date}
+                onChange={(e) =>
+                  setForm({ ...form, scheduled_date: e.target.value })
+                }
+              />
+            </label>
+            <label>
+              Priority
+              <select
+                value={form.priority}
+                onChange={(e) =>
+                  setForm({ ...form, priority: e.target.value as Priority })
+                }
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </label>
+          </div>
+          {error && <ErrorState message={error} />}
+          <div className="modal-actions">
+            <button type="button" className="button subtle" onClick={onClose}>
+              Cancel
+            </button>
+            <button className="button primary" disabled={save.isPending}>
+              Save Todo
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function NotesPage() {
+  const queryClient = useQueryClient();
+  const [search, setSearch] = useState("");
+  const [editing, setEditing] = useState<Note | null>(null);
+  const [show, setShow] = useState(false);
+  const notes = useQuery({
+    queryKey: ["notes", search],
+    queryFn: () => api.notes(search || undefined),
+  });
+  const del = useMutation({
+    mutationFn: api.deleteNote,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notes"] }),
+  });
+  return (
+    <>
+      <PageHeader
+        eyebrow="THOUGHTS & REFLECTIONS"
+        title="Notes"
+        description="Keep the context that helps you do the work."
+        action={
+          <button
+            className="button primary"
+            onClick={() => {
+              setEditing(null);
+              setShow(true);
+            }}
+          >
+            + New note
+          </button>
+        }
+      />
+      <div className="search-bar">
+        <input
+          placeholder="Search notes…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+      {notes.isLoading ? (
+        <Spinner />
+      ) : notes.isError ? (
+        <ErrorState message={(notes.error as Error).message} />
+      ) : notes.data!.length ? (
+        <div className="notes-grid">
+          {notes.data!.map((note) => (
+            <NoteCard
+              key={note.id}
+              note={note}
+              onEdit={() => {
+                setEditing(note);
+                setShow(true);
+              }}
+              onDelete={() =>
+                window.confirm("Delete this note?") && del.mutate(note.id)
+              }
+            />
+          ))}
+        </div>
+      ) : (
+        <EmptyState>No notes found. Write something down.</EmptyState>
+      )}
+      {show && <NoteEditor note={editing} onClose={() => setShow(false)} />}
+    </>
+  );
+}
+function NoteEditor({
+  note,
+  onClose,
+}: {
+  note: Note | null;
+  onClose: () => void;
+}) {
+  const queryClient = useQueryClient();
+  const [title, setTitle] = useState(note?.title || "");
+  const [content, setContent] = useState(note?.content || "");
+  const save = useMutation({
+    mutationFn: () =>
+      note
+        ? api.updateNote(note.id, { title, content })
+        : api.createNote({ title, content }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      onClose();
+    },
+  });
+  return (
+    <div className="modal-backdrop">
+      <div className="modal">
+        <div className="modal-heading">
+          <div>
+            <div className="eyebrow">MAKE SPACE</div>
+            <h2>{note ? "Edit note" : "New note"}</h2>
+          </div>
+          <button className="close-button" onClick={onClose}>
+            ×
+          </button>
+        </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            save.mutate();
+          }}
+        >
+          <label>
+            Title
+            <input
+              autoFocus
+              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </label>
+          <label>
+            Content
+            <textarea
+              required
+              rows={8}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+            />
+          </label>
+          <div className="modal-actions">
+            <button type="button" className="button subtle" onClick={onClose}>
+              Cancel
+            </button>
+            <button className="button primary" disabled={save.isPending}>
+              Save note
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
 
 function DailyReviewPage() {
   const { reviewDate: routeDate } = useParams<{ reviewDate: string }>();
@@ -82,26 +1120,336 @@ function DailyReviewPage() {
   const today = todayForTimezone(user?.timezone || "Asia/Kolkata");
   const reviewDate = routeDate === "today" || !routeDate ? today : routeDate;
   const queryClient = useQueryClient();
-  const review = useQuery({ queryKey: ["review", reviewDate], queryFn: () => api.review(reviewDate) });
-  const save = useMutation({ mutationFn: (data: { mood_score: number | null; went_well: string; improvement: string }) => review.data?.id ? api.updateReview(reviewDate, data) : api.createReview(reviewDate, data), onSuccess: () => queryClient.invalidateQueries({ queryKey: ["review", reviewDate] }) });
-  const move = (days: number) => navigate(`/reviews/${addCalendarDays(reviewDate, days)}`);
+  const review = useQuery({
+    queryKey: ["review", reviewDate],
+    queryFn: () => api.review(reviewDate),
+  });
+  const save = useMutation({
+    mutationFn: (data: {
+      mood_score: number | null;
+      went_well: string;
+      improvement: string;
+    }) =>
+      review.data?.id
+        ? api.updateReview(reviewDate, data)
+        : api.createReview(reviewDate, data),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["review", reviewDate] }),
+  });
+  const move = (days: number) =>
+    navigate(`/reviews/${addCalendarDays(reviewDate, days)}`);
   if (review.isLoading) return <Spinner />;
-  if (review.isError) return <ErrorState message={(review.error as Error).message} />;
+  if (review.isError)
+    return <ErrorState message={(review.error as Error).message} />;
   const data = review.data!;
-  return <><PageHeader eyebrow="REFLECTION, NOT PUNISHMENT" title="Daily Review" description="Look back honestly so tomorrow can be more realistic." action={<div className="review-nav"><button className="text-button" onClick={() => move(-1)}>← Previous</button><button className="text-button" onClick={() => move(1)}>Next →</button></div>} /><section className="review-layout"><div className="panel"><div className="review-date"><div className="eyebrow">DAILY REVIEW</div><h2>{new Date(`${reviewDate}T12:00:00`).toLocaleDateString(undefined, { month: "long", day: "numeric" })}</h2></div><div className="review-stats"><StatCard label="You planned" value={data.stats.planned} /><StatCard label="Completed" value={data.stats.completed} accent="green" /><StatCard label="Missed" value={data.stats.missed} accent="red" /><StatCard label="Carried forward" value={data.stats.carried_forward} /></div><p className="review-rate">Completion rate <strong>{Math.round(data.stats.completion_rate * 100)}%</strong>{data.stats.successful ? " · Successful day" : data.stats.neutral ? " · Neutral day" : data.stats.pending ? " · Still in progress" : " · Keep planning honestly"}</p><DailyReviewForm key={`${reviewDate}-${data.updated_at || "empty"}`} review={data} onSave={values => save.mutate(values)} saving={save.isPending} />{save.isError && <ErrorState message={(save.error as Error).message} />}</div><AccountabilityMessage message="A daily review is optional. It never costs points; it only helps you plan better." /></section></>;
+  return (
+    <>
+      <PageHeader
+        eyebrow="REFLECTION, NOT PUNISHMENT"
+        title="Daily Review"
+        description="Look back honestly so tomorrow can be more realistic."
+        action={
+          <div className="review-nav">
+            <button className="text-button" onClick={() => move(-1)}>
+              ← Previous
+            </button>
+            <button className="text-button" onClick={() => move(1)}>
+              Next →
+            </button>
+          </div>
+        }
+      />
+      <section className="review-layout">
+        <div className="panel">
+          <div className="review-date">
+            <div className="eyebrow">DAILY REVIEW</div>
+            <h2>
+              {new Date(`${reviewDate}T12:00:00`).toLocaleDateString(
+                undefined,
+                { month: "long", day: "numeric" },
+              )}
+            </h2>
+          </div>
+          <div className="review-stats">
+            <StatCard label="You planned" value={data.stats.planned} />
+            <StatCard
+              label="Completed"
+              value={data.stats.completed}
+              accent="green"
+            />
+            <StatCard label="Missed" value={data.stats.missed} accent="red" />
+            <StatCard
+              label="Carried forward"
+              value={data.stats.carried_forward}
+            />
+          </div>
+          <p className="review-rate">
+            Completion rate{" "}
+            <strong>{Math.round(data.stats.completion_rate * 100)}%</strong>
+            {data.stats.successful
+              ? " · Successful day"
+              : data.stats.neutral
+                ? " · Neutral day"
+                : data.stats.pending
+                  ? " · Still in progress"
+                  : " · Keep planning honestly"}
+          </p>
+          <DailyReviewForm
+            key={`${reviewDate}-${data.updated_at || "empty"}`}
+            review={data}
+            onSave={(values) => save.mutate(values)}
+            saving={save.isPending}
+          />
+          {save.isError && (
+            <ErrorState message={(save.error as Error).message} />
+          )}
+        </div>
+        <AccountabilityMessage message="A daily review is optional. It never costs points; it only helps you plan better." />
+      </section>
+    </>
+  );
 }
 
 function AccountabilityPage() {
   const [range, setRange] = useState<"today" | "7d" | "month">("7d");
-  const summary = useQuery({ queryKey: ["accountability", range], queryFn: () => api.accountability(range) });
+  const summary = useQuery({
+    queryKey: ["accountability", range],
+    queryFn: () => api.accountability(range),
+  });
   if (summary.isLoading) return <Spinner />;
-  if (summary.isError) return <ErrorState message={(summary.error as Error).message} />;
+  if (summary.isError)
+    return <ErrorState message={(summary.error as Error).message} />;
   const data = summary.data!;
   const percent = (value: number) => `${Math.round(value * 100)}%`;
-  return <><PageHeader eyebrow="HONEST PATTERNS" title="Accountability" description="Use the data to plan a life you can actually finish." action={<div className="range-tabs">{(["today", "7d", "month"] as const).map(value => <button key={value} className={`button small ${range === value ? "primary" : "subtle"}`} onClick={() => setRange(value)}>{value === "today" ? "Today" : value === "7d" ? "Last 7 days" : "This month"}</button>)}</div>} /><AccountabilityMessage message={data.accountability_message} /><div className="stats-grid accountability-stats"><StatCard label="Completion" value={percent(data.completion_rate)} accent="green" /><StatCard label="Planning accuracy" value={percent(data.planning_accuracy)} /><StatCard label="Miss rate" value={percent(data.miss_rate)} accent="red" /><StatCard label="Carry-forward" value={percent(data.carry_forward_rate)} /></div><div className="content-grid"><section className="panel"><div className="panel-heading"><h2>Point accounting</h2><strong className="planning-points">{data.net_points >= 0 ? `+${data.net_points}` : data.net_points} net</strong></div><div className="breakdown-list"><div><span>Completed</span><strong>+{data.completed_points}</strong></div><div><span>Tomorrow planning</span><strong>+{data.planning_points}</strong></div><div><span>Carry-forward bonus</span><strong>+{data.carry_forward_bonus_points}</strong></div><div><span>Missed</span><strong className="negative">{data.missed_points}</strong></div><div><span>Points earned / lost</span><strong>+{data.points_earned} / -{data.points_lost}</strong></div></div><div className="panel-heading accountability-heading"><h2>Streak</h2><span>Current {data.current_streak} · Best {data.max_streak}</span></div><div className="panel-heading accountability-heading"><h2>Missed Todo reasons</h2><span>{data.missed_count} total</span></div>{data.missed_reasons.length ? <div className="breakdown-list">{data.missed_reasons.map(reason => <div key={reason.code}><span>{reason.label}</span><strong>{percent(reason.percentage)}</strong></div>)}</div> : <EmptyState>No missed Todos in this range.</EmptyState>}</section><aside className="side-stack"><section className="panel"><div className="panel-heading"><h2>Planning signal</h2></div><div className="mini-metrics"><span><strong>{data.average_planned_per_day}</strong>Avg planned</span><span><strong>{data.average_completed_per_day}</strong>Avg completed</span></div>{data.overplanning_warning ? <div className="warning-card">{data.overplanning_warning}</div> : <p className="muted">Your recent plan is within the current accountability thresholds.</p>}</section><section className="panel"><div className="panel-heading"><h2>Day by day</h2></div>{data.daily.filter(day => !day.neutral).map(day => <div className="history-row" key={day.review_date}><span>{new Date(`${day.review_date}T12:00:00`).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span><strong className={day.successful ? "positive" : "negative"}>{day.successful ? "Successful" : `${percent(day.completion_rate)} complete`}</strong></div>)}{data.daily.every(day => day.neutral) && <EmptyState>No planned days in this range.</EmptyState>}</section></aside></div></>;
+  return (
+    <>
+      <PageHeader
+        eyebrow="HONEST PATTERNS"
+        title="Accountability"
+        description="Use the data to plan a life you can actually finish."
+        action={
+          <div className="range-tabs">
+            {(["today", "7d", "month"] as const).map((value) => (
+              <button
+                key={value}
+                className={`button small ${range === value ? "primary" : "subtle"}`}
+                onClick={() => setRange(value)}
+              >
+                {value === "today"
+                  ? "Today"
+                  : value === "7d"
+                    ? "Last 7 days"
+                    : "This month"}
+              </button>
+            ))}
+          </div>
+        }
+      />
+      <AccountabilityMessage message={data.accountability_message} />
+      <div className="stats-grid accountability-stats">
+        <StatCard
+          label="Completion"
+          value={percent(data.completion_rate)}
+          accent="green"
+        />
+        <StatCard
+          label="Planning accuracy"
+          value={percent(data.planning_accuracy)}
+        />
+        <StatCard
+          label="Miss rate"
+          value={percent(data.miss_rate)}
+          accent="red"
+        />
+        <StatCard
+          label="Carry-forward"
+          value={percent(data.carry_forward_rate)}
+        />
+      </div>
+      <div className="content-grid">
+        <section className="panel">
+          <div className="panel-heading">
+            <h2>Point accounting</h2>
+            <strong className="planning-points">
+              {data.net_points >= 0 ? `+${data.net_points}` : data.net_points}{" "}
+              net
+            </strong>
+          </div>
+          <div className="breakdown-list">
+            <div>
+              <span>Completed</span>
+              <strong>+{data.completed_points}</strong>
+            </div>
+            <div>
+              <span>Tomorrow planning</span>
+              <strong>+{data.planning_points}</strong>
+            </div>
+            <div>
+              <span>Carry-forward bonus</span>
+              <strong>+{data.carry_forward_bonus_points}</strong>
+            </div>
+            <div>
+              <span>Missed</span>
+              <strong className="negative">{data.missed_points}</strong>
+            </div>
+            <div>
+              <span>Points earned / lost</span>
+              <strong>
+                +{data.points_earned} / -{data.points_lost}
+              </strong>
+            </div>
+          </div>
+          <div className="panel-heading accountability-heading">
+            <h2>Streak</h2>
+            <span>
+              Current {data.current_streak} · Best {data.max_streak}
+            </span>
+          </div>
+          <div className="panel-heading accountability-heading">
+            <h2>Missed Todo reasons</h2>
+            <span>{data.missed_count} total</span>
+          </div>
+          {data.missed_reasons.length ? (
+            <div className="breakdown-list">
+              {data.missed_reasons.map((reason) => (
+                <div key={reason.code}>
+                  <span>{reason.label}</span>
+                  <strong>{percent(reason.percentage)}</strong>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState>No missed Todos in this range.</EmptyState>
+          )}
+        </section>
+        <aside className="side-stack">
+          <section className="panel">
+            <div className="panel-heading">
+              <h2>Planning signal</h2>
+            </div>
+            <div className="mini-metrics">
+              <span>
+                <strong>{data.average_planned_per_day}</strong>Avg planned
+              </span>
+              <span>
+                <strong>{data.average_completed_per_day}</strong>Avg completed
+              </span>
+            </div>
+            {data.overplanning_warning ? (
+              <div className="warning-card">{data.overplanning_warning}</div>
+            ) : (
+              <p className="muted">
+                Your recent plan is within the current accountability
+                thresholds.
+              </p>
+            )}
+          </section>
+          <section className="panel">
+            <div className="panel-heading">
+              <h2>Day by day</h2>
+            </div>
+            {data.daily
+              .filter((day) => !day.neutral)
+              .map((day) => (
+                <div className="history-row" key={day.review_date}>
+                  <span>
+                    {new Date(`${day.review_date}T12:00:00`).toLocaleDateString(
+                      undefined,
+                      { month: "short", day: "numeric" },
+                    )}
+                  </span>
+                  <strong className={day.successful ? "positive" : "negative"}>
+                    {day.successful
+                      ? "Successful"
+                      : `${percent(day.completion_rate)} complete`}
+                  </strong>
+                </div>
+              ))}
+            {data.daily.every((day) => day.neutral) && (
+              <EmptyState>No planned days in this range.</EmptyState>
+            )}
+          </section>
+        </aside>
+      </div>
+    </>
+  );
 }
 
-function SettingsPage() { const user = JSON.parse(localStorage.getItem("two-do-user") || "null"); return <><PageHeader eyebrow="YOUR ACCOUNT" title="Settings" description="A quiet place for the basics." /><section className="panel settings"><h2>Profile</h2><label>Name<input value={user?.name || ""} readOnly /></label><label>Email<input value={user?.email || ""} readOnly /></label><label>Timezone<input value={user?.timezone || "Asia/Kolkata"} readOnly /></label><p className="muted">Profile editing and timezone updates will arrive in a later phase.</p></section></>; }
-function PageHeader({ eyebrow, title, description, action }: { eyebrow: string; title: string; description: string; action?: ReactNode }) { return <header className="page-header"><div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1><p>{description}</p></div>{action}</header>; }
+function SettingsPage() {
+  const user = JSON.parse(localStorage.getItem("two-do-user") || "null");
+  return (
+    <>
+      <PageHeader
+        eyebrow="YOUR ACCOUNT"
+        title="Settings"
+        description="A quiet place for the basics."
+      />
+      <section className="panel settings">
+        <h2>Profile</h2>
+        <label>
+          Name
+          <input value={user?.name || ""} readOnly />
+        </label>
+        <label>
+          Email
+          <input value={user?.email || ""} readOnly />
+        </label>
+        <label>
+          Timezone
+          <input value={user?.timezone || "Asia/Kolkata"} readOnly />
+        </label>
+        <p className="muted">
+          Profile editing and timezone updates will arrive in a later phase.
+        </p>
+      </section>
+    </>
+  );
+}
+function PageHeader({
+  eyebrow,
+  title,
+  description,
+  action,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  action?: ReactNode;
+}) {
+  return (
+    <header className="page-header">
+      <div>
+        <div className="eyebrow">{eyebrow}</div>
+        <h1>{title}</h1>
+        <p>{description}</p>
+      </div>
+      {action}
+    </header>
+  );
+}
 
-export default function App() { return <Routes><Route path="/login" element={<AuthPage />} /><Route path="/register" element={<AuthPage register />} /><Route element={<Protected><Layout /></Protected>}><Route path="/" element={<Navigate to="/dashboard" replace />} /><Route path="/dashboard" element={<DashboardPage />} /><Route path="/todos" element={<TodosPage />} /><Route path="/calendar" element={<CalendarPage />} /><Route path="/reviews/:reviewDate" element={<DailyReviewPage />} /><Route path="/accountability" element={<AccountabilityPage />} /><Route path="/notes" element={<NotesPage />} /><Route path="/settings" element={<SettingsPage />} /></Route></Routes>; }
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<AuthPage />} />
+      <Route path="/register" element={<AuthPage register />} />
+      <Route
+        element={
+          <Protected>
+            <Layout />
+          </Protected>
+        }
+      >
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/todos/history" element={<TodosHistoryPage />} />
+        <Route path="/todos" element={<TodosPage />} />
+        <Route path="/calendar" element={<CalendarPage />} />
+        <Route path="/reviews/:reviewDate" element={<DailyReviewPage />} />
+        <Route path="/accountability" element={<AccountabilityPage />} />
+        <Route path="/notes" element={<NotesPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+      </Route>
+    </Routes>
+  );
+}

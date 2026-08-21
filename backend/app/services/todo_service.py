@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
@@ -6,6 +8,7 @@ from app.core.accountability import (
     CARRY_FORWARD_BONUS,
     MISS_REASON_LABELS,
     MISSED_TODO_PENALTY,
+    TODO_HISTORY_RETENTION_DAYS,
     TODO_COMPLETION_POINTS,
     miss_reason_label,
 )
@@ -45,6 +48,66 @@ class TodoService:
         self.db.commit()
         self.db.refresh(todo)
         return todo
+
+    @staticmethod
+    def _normalized(value: str | None) -> str:
+        return " ".join((value or "").split()).casefold()
+
+    def _is_equivalent(self, first: Todo, second: Todo) -> bool:
+        return (
+            self._normalized(first.title) == self._normalized(second.title)
+            and self._normalized(first.description) == self._normalized(second.description)
+            and first.priority == second.priority
+        )
+
+    def _reuse_one(self, user: User, source_id: str, today, today_todos: list[Todo]) -> Todo | None:
+        source = self.repository.get_for_update(self.db, user.id, source_id)
+        if not source:
+            raise HTTPException(status_code=404, detail="Historical Todo not found")
+        history_start = today - timedelta(days=TODO_HISTORY_RETENTION_DAYS - 1)
+        history_end = today - timedelta(days=1)
+        if source.scheduled_date < history_start or source.scheduled_date > history_end:
+            raise HTTPException(status_code=400, detail="This Todo is outside the 15-day reuse window")
+        if any(self._is_equivalent(source, todo) for todo in today_todos):
+            return None
+        todo = Todo(
+            user_id=user.id,
+            title=source.title,
+            description=source.description,
+            scheduled_date=today,
+            original_scheduled_date=today,
+            priority=source.priority,
+            source_todo_id=source.id,
+        )
+        self.db.add(todo)
+        self.db.flush()
+        today_todos.append(todo)
+        return todo
+
+    def reuse(self, user: User, source_id: str, allow_duplicate_skip: bool = False) -> Todo:
+        today = user_today(user.timezone)
+        today_todos = self.repository.list(self.db, user.id, scheduled_date=today)
+        todo = self._reuse_one(user, source_id, today, today_todos)
+        if todo is None:
+            if allow_duplicate_skip:
+                raise HTTPException(status_code=409, detail="This Todo is already on today's Todo list")
+            raise HTTPException(status_code=409, detail="This Todo is already on today's Todo list")
+        self.db.commit()
+        self.db.refresh(todo)
+        return todo
+
+    def reuse_many(self, user: User, source_ids: list[str]) -> list[Todo]:
+        today = user_today(user.timezone)
+        today_todos = self.repository.list(self.db, user.id, scheduled_date=today)
+        created: list[Todo] = []
+        for source_id in dict.fromkeys(source_ids):
+            todo = self._reuse_one(user, source_id, today, today_todos)
+            if todo is not None:
+                created.append(todo)
+        self.db.commit()
+        for todo in created:
+            self.db.refresh(todo)
+        return created
 
     def update(self, user: User, todo_id: str, payload: TodoUpdate) -> Todo:
         todo = self.get(user, todo_id)
