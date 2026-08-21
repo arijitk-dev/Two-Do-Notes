@@ -1,16 +1,16 @@
 # Graph Report - Two-Do-Notes  (2026-08-21)
 
 ## Corpus Check
-- 86 files · ~24,393 words
+- 88 files · ~25,766 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 565 nodes · 1139 edges · 42 communities (36 shown, 6 thin omitted)
+- 581 nodes · 1154 edges · 44 communities (37 shown, 7 thin omitted)
 - Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 82 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `edf6e266`
+- Built from commit: `4cc35a8d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -42,6 +42,8 @@
 - AGENTS.md
 - extraction-spec.md
 - vitest.polyfill.cjs
+- Production deployment
+- vercel.json
 
 ## God Nodes (most connected - your core abstractions)
 1. `User` - 31 edges
@@ -56,8 +58,6 @@
 10. `compilerOptions` - 15 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `accountability()` --uses--> `AccountabilityService`  [INFERRED]
-  backend/app/api/accountability.py → backend/app/services/accountability_service.py
 - `register()` --uses--> `User`  [INFERRED]
   backend/app/api/auth.py → backend/app/models/user.py
 - `login()` --uses--> `User`  [INFERRED]
@@ -66,19 +66,21 @@
   backend/app/api/dashboard.py → backend/app/repositories/note_repository.py
 - `dashboard()` --uses--> `TodoRepository`  [INFERRED]
   backend/app/api/dashboard.py → backend/app/repositories/todo_repository.py
+- `dashboard()` --uses--> `AccountabilityService`  [INFERRED]
+  backend/app/api/dashboard.py → backend/app/services/accountability_service.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (42 total, 6 thin omitted)
+## Communities (44 total, 7 thin omitted)
 
 ### Community 0 - "User"
 Cohesion: 0.08
-Nodes (40): accountability_message(), miss_reason_label(), MissReasonCode, StrEnum, Select a stable message for a context without showing one on every action., Base, health(), get (+32 more)
+Nodes (37): miss_reason_label(), MissReasonCode, StrEnum, Base, health(), get, startup_event(), DailyReview (+29 more)
 
 ### Community 1 - "App.tsx"
 Cohesion: 0.06
-Nodes (37): api, addCalendarDays(), App(), CalendarPage(), DailyReviewPage(), todayForTimezone(), todoDateFromSearch(), TodosPage() (+29 more)
+Nodes (38): api, addCalendarDays(), App(), CalendarPage(), DailyReviewPage(), formatTodoDate(), todayForTimezone(), todoDateFromSearch() (+30 more)
 
 ### Community 2 - "TodoService"
 Cohesion: 0.11
@@ -89,28 +91,28 @@ Cohesion: 0.05
 Nodes (41): autoprefixer, dependencies, react, react-dom, react-router-dom, @tanstack/react-query, devDependencies, autoprefixer (+33 more)
 
 ### Community 4 - "api/auth.py"
-Cohesion: 0.12
-Nodes (29): run_migrations_offline(), login(), logout(), me(), CurrentUser, DbSession, get, post (+21 more)
+Cohesion: 0.09
+Nodes (31): run_migrations_offline(), login(), logout(), me(), CurrentUser, DbSession, get, post (+23 more)
 
 ### Community 5 - "user_today"
 Cohesion: 0.10
 Nodes (27): get_streak(), CurrentUser, DbSession, get, date, datetime, user_today(), user_tomorrow() (+19 more)
 
 ### Community 6 - "DailyReviewService"
-Cohesion: 0.13
-Nodes (25): accountability(), CurrentUser, date, DbSession, get, create_review(), get_review(), CurrentUser (+17 more)
+Cohesion: 0.19
+Nodes (16): create_review(), get_review(), CurrentUser, date, DbSession, get, patch, post (+8 more)
 
 ### Community 7 - "notes.py"
 Cohesion: 0.15
 Nodes (22): create_note(), delete_note(), get_note(), get_note_endpoint(), list_notes(), CurrentUser, DbSession, delete (+14 more)
 
 ### Community 8 - "AccountabilityService"
-Cohesion: 0.15
-Nodes (13): AccountabilityService, DayMetrics, date, datetime, Session, Todo, User, Calculates accountability from Todo and point-ledger data, never stored metrics. (+5 more)
+Cohesion: 0.10
+Nodes (24): accountability(), CurrentUser, date, DbSession, get, accountability_message(), Select a stable message for a context without showing one on every action., AccountabilityResponse (+16 more)
 
 ### Community 9 - "TodoRepository"
-Cohesion: 0.15
-Nodes (15): get_calendar(), CurrentUser, DbSession, get, date, Session, Todo, TodoRepository (+7 more)
+Cohesion: 0.14
+Nodes (16): get_calendar(), CurrentUser, DbSession, get, date, Session, Todo, TodoRepository (+8 more)
 
 ### Community 10 - "What You Must Do When Invoked"
 Cohesion: 0.08
@@ -129,8 +131,8 @@ Cohesion: 0.12
 Nodes (15): compilerOptions, allowImportingTsExtensions, lib, module, moduleDetection, moduleResolution, noEmit, skipLibCheck (+7 more)
 
 ### Community 14 - "Two Do Notes"
-Cohesion: 0.17
-Nodes (11): Architecture, Environment variables, Future phases, Local development, Phase 1 and Phase 2 scope, Phase 2 rules, Phase 3 rules, Run with Docker (+3 more)
+Cohesion: 0.15
+Nodes (12): Architecture, Environment variables, Future phases, Local development, Phase 1 and Phase 2 scope, Phase 2 rules, Phase 3 rules, Production architecture (+4 more)
 
 ### Community 15 - "graphify reference: extra exports and benchmark"
 Cohesion: 0.22
@@ -156,20 +158,24 @@ Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify refer
 Cohesion: 0.50
 Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
+### Community 42 - "Production deployment"
+Cohesion: 0.29
+Nodes (6): 1. GitHub, 2. Neon, 3. Render, 4. Vercel, 5. Smoke test, Production deployment
+
 ## Knowledge Gaps
-- **115 isolated node(s):** `name`, `private`, `version`, `type`, `dev` (+110 more)
+- **122 isolated node(s):** `name`, `private`, `version`, `type`, `dev` (+117 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `User` connect `User` to `TodoService`, `api/auth.py`, `user_today`, `DailyReviewService`, `AccountabilityService`, `TodoRepository`?**
-  _High betweenness centrality (0.061) - this node is a cross-community bridge._
+  _High betweenness centrality (0.059) - this node is a cross-community bridge._
 - **Why does `AccountabilityService` connect `AccountabilityService` to `User`, `dashboard.py`, `DailyReviewService`?**
-  _High betweenness centrality (0.044) - this node is a cross-community bridge._
+  _High betweenness centrality (0.042) - this node is a cross-community bridge._
 - **Why does `TodoService` connect `TodoService` to `User`, `TodoRepository`?**
-  _High betweenness centrality (0.032) - this node is a cross-community bridge._
+  _High betweenness centrality (0.031) - this node is a cross-community bridge._
 - **Are the 13 inferred relationships involving `User` (e.g. with `login()` and `register()`) actually correct?**
   _`User` has 13 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 16 inferred relationships involving `TodoService` (e.g. with `complete_todo()` and `create_todo()`) actually correct?**

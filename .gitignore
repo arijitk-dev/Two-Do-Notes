@@ -8,6 +8,17 @@ backend/.env
 frontend/node_modules/
 frontend/dist/
 .env
+.env.*
+!.env.example
+coverage/
+build/
+postgres_data/
+.idea/
+.vscode/
+frontend/.vercel/
+backend/.mypy_cache/
+*.log
+Dockerfile.local
 .DS_Store
 graphify-out/cache/
 graphify-out/[0-9]*

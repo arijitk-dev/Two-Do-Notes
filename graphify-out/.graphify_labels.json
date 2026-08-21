@@ -40,5 +40,7 @@
   "38": "tailwind.config.js",
   "39": "vite.config.ts",
   "40": "vitest.config.ts",
-  "41": "tailwindcss"
+  "41": "tailwindcss",
+  "42": "Production deployment",
+  "43": "vercel.json"
 }

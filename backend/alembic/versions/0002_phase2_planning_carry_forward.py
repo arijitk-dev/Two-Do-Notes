@@ -10,23 +10,13 @@ depends_on = None
 
 def _widen_alembic_version_column() -> None:
     """Allow revision identifiers longer than Alembic's 32-character default."""
-    bind = op.get_bind()
-    if bind.dialect.name == "sqlite":
-        with op.batch_alter_table("alembic_version") as batch_op:
-            batch_op.alter_column(
-                "version_num",
-                existing_type=sa.String(length=32),
-                type_=sa.String(length=64),
-                existing_nullable=False,
-            )
-    else:
-        op.alter_column(
-            "alembic_version",
-            "version_num",
-            existing_type=sa.String(length=32),
-            type_=sa.String(length=64),
-            existing_nullable=False,
-        )
+    op.alter_column(
+        "alembic_version",
+        "version_num",
+        existing_type=sa.String(length=32),
+        type_=sa.String(length=64),
+        existing_nullable=False,
+    )
 
 
 def upgrade() -> None:
@@ -37,7 +27,7 @@ def upgrade() -> None:
     op.add_column("todos", sa.Column("carry_forward_bonus_awarded", sa.Boolean(), nullable=False, server_default=sa.false()))
     op.execute("UPDATE todos SET original_scheduled_date = scheduled_date WHERE original_scheduled_date IS NULL")
     op.create_index("ix_todos_user_status", "todos", ["user_id", "status"])
-    # A unique index works on both PostgreSQL and SQLite (used by the test suite).
+    # The immutable point ledger relies on this database-level uniqueness rule.
     op.create_index("uq_point_transaction_todo_type", "point_transactions", ["todo_id", "transaction_type"], unique=True)
 
 

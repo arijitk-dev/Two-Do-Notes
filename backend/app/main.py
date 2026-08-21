@@ -14,7 +14,7 @@ settings = get_settings()
 app = FastAPI(title="Two Do Notes API", version="1.0.0", description="Personal productivity and accountability API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_origin],
+    allow_origins=settings.cors_origin_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

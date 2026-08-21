@@ -17,12 +17,17 @@ backend/alembic/versions/{0001_initial,0002_phase2_planning_carry_forward,0003_p
 docker-compose.yml
 ```
 
+## Production architecture
+
+Production is prepared for Vercel (frontend), Render (FastAPI backend), and Neon PostgreSQL. The `prod` branch is the intended production deployment branch; `main` remains development/integration and `fix` remains the existing fix branch. This repository does not auto-deploy or configure provider accounts.
+
 ## Run with Docker
 
 Prerequisites: Docker Desktop with Compose.
 
 ```bash
 cp .env.example .env
+# Set a strong JWT_SECRET and local PostgreSQL password in .env.
 docker compose up --build
 ```
 
@@ -30,14 +35,14 @@ Open <http://localhost:5173>. The API is at <http://localhost:8000>, Swagger is 
 
 ## Local development
 
-For the backend, use Python 3.12+, create a virtual environment, install `backend/requirements.txt`, and run from `backend/`:
+For the backend, use Python 3.12+, create a virtual environment, install `backend/requirements.txt`, set `DATABASE_URL` to a PostgreSQL connection string, and run from `backend/`:
 
 ```bash
 alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-Without `DATABASE_URL`, the backend uses a local SQLite database for convenience. Set `DATABASE_URL` to PostgreSQL when running against Postgres. For the frontend, use Node 20+:
+For the frontend, use Node 20+ and set `VITE_API_BASE_URL` before building or running Vite:
 
 ```bash
 cd frontend
@@ -48,11 +53,13 @@ npm run dev
 ## Tests
 
 ```bash
-cd backend && pytest
-cd frontend && npm test
+cd backend
+TEST_DATABASE_URL=postgresql+psycopg://two_do:local-password@localhost:5432/two_do_notes_test pytest
+cd ../frontend
+npm test
 ```
 
-Backend tests use isolated SQLite and cover authentication, protection, ownership, Todo CRUD actions, idempotent points, missed reasons, streak initialization, Notes, today defaults, 15-day history, and safe reuse. Frontend tests use Vitest and React Testing Library.
+Backend tests require a dedicated PostgreSQL database via `TEST_DATABASE_URL`; they cover authentication, protection, ownership, Todo CRUD actions, idempotent points, missed reasons, streak initialization, Notes, today defaults, 15-day history, and safe reuse. Frontend tests use Vitest and React Testing Library.
 
 ## Phase 2 rules
 
@@ -84,7 +91,9 @@ Phase 3 API additions include `GET /api/v1/accountability?range=today|7d|month`,
 
 ## Environment variables
 
-See [.env.example](.env.example). `JWT_SECRET` must be replaced for any non-local deployment. `DEFAULT_TIMEZONE` defaults to `Asia/Kolkata`, but all “today” calculations read the user timezone rather than embedding that value in business logic.
+See [.env.example](.env.example). Backend production requires `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGINS`, and `ENVIRONMENT=production`. The frontend build requires `VITE_API_BASE_URL`. `JWT_SECRET` must be a long random value, and `CORS_ORIGINS` must contain only the actual Vercel origin(s) in production. `DEFAULT_TIMEZONE` defaults to `Asia/Kolkata`, but all “today” calculations read the user timezone rather than embedding that value in business logic.
+
+Production PostgreSQL backups are managed by Neon; the application does not provide a custom backup system.
 
 ## Future phases
 

@@ -17,21 +17,11 @@ def upgrade() -> None:
         sa.ForeignKey("todos.id", name="fk_todos_source_todo_id", ondelete="SET NULL"),
         nullable=True,
     )
-    if op.get_bind().dialect.name == "sqlite":
-        with op.batch_alter_table("todos", recreate="always") as batch_op:
-            batch_op.add_column(column)
-            batch_op.create_index("ix_todos_source_todo_id", ["source_todo_id"])
-    else:
-        op.add_column("todos", column)
-        op.create_index("ix_todos_source_todo_id", "todos", ["source_todo_id"])
+    op.add_column("todos", column)
+    op.create_index("ix_todos_source_todo_id", "todos", ["source_todo_id"])
 
 
 def downgrade() -> None:
-    if op.get_bind().dialect.name == "sqlite":
-        with op.batch_alter_table("todos", recreate="always") as batch_op:
-            batch_op.drop_index("ix_todos_source_todo_id")
-            batch_op.drop_column("source_todo_id")
-    else:
-        op.drop_index("ix_todos_source_todo_id", table_name="todos")
-        op.drop_constraint("fk_todos_source_todo_id", "todos", type_="foreignkey")
-        op.drop_column("todos", "source_todo_id")
+    op.drop_index("ix_todos_source_todo_id", table_name="todos")
+    op.drop_constraint("fk_todos_source_todo_id", "todos", type_="foreignkey")
+    op.drop_column("todos", "source_todo_id")

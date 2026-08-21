@@ -1,7 +1,11 @@
 import os
 
-os.environ["DATABASE_URL"] = "sqlite:///./test_two_do_notes.db"
-os.environ["JWT_SECRET"] = "test-secret"
+test_database_url = os.environ.get("TEST_DATABASE_URL")
+if not test_database_url:
+    raise RuntimeError("TEST_DATABASE_URL must point to a dedicated PostgreSQL test database")
+os.environ["DATABASE_URL"] = test_database_url
+os.environ["JWT_SECRET"] = os.environ.get("TEST_JWT_SECRET", "test-secret")
+os.environ["ENVIRONMENT"] = "testing"
 
 import pytest
 from fastapi.testclient import TestClient
@@ -29,4 +33,3 @@ def auth_client(client):
     response = client.post("/api/v1/auth/register", json={"name": "Asha", "email": "asha@example.com", "password": "password123"})
     client.headers.update({"Authorization": f"Bearer {response.json()['access_token']}"})
     return client
-
