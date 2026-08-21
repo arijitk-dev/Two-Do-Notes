@@ -5,12 +5,20 @@
       "backend_alembic_env_run_migrations_online",
       "backend_app_api_init",
       "backend_app_api_streak",
+      "backend_app_core_accountability",
+      "backend_app_core_accountability_accountability_message",
+      "backend_app_core_accountability_miss_reason_label",
+      "backend_app_core_accountability_missreasoncode",
+      "backend_app_core_accountability_py_strenum",
+      "backend_app_core_accountability_rationale_47",
       "backend_app_db_session",
       "backend_app_db_session_base",
       "backend_app_main",
       "backend_app_main_health",
       "backend_app_main_py_get",
       "backend_app_main_startup_event",
+      "backend_app_models_daily_review",
+      "backend_app_models_daily_review_dailyreview",
       "backend_app_models_init",
       "backend_app_models_note",
       "backend_app_models_point_transaction",
@@ -27,14 +35,10 @@
       "backend_app_models_user",
       "backend_app_models_user_user",
       "backend_app_repositories_point_repository",
-      "backend_app_repositories_point_repository_pointrepository",
-      "backend_app_repositories_point_repository_pointrepository_history",
-      "backend_app_repositories_point_repository_pointrepository_planning_points_for_date",
-      "backend_app_repositories_point_repository_pointrepository_total",
-      "backend_app_repositories_point_repository_py_date",
-      "backend_app_repositories_point_repository_py_session",
       "backend_app_repositories_todo_repository",
+      "backend_app_services_accountability_service",
       "backend_app_services_carry_forward_service",
+      "backend_app_services_carry_forward_service_carryforwardservice",
       "backend_app_services_planning_service",
       "backend_app_services_planning_service_planningservice",
       "backend_app_services_planning_service_planningservice_init",
@@ -43,9 +47,9 @@
       "backend_app_services_point_service_pointservice_award_once",
       "backend_app_services_point_service_py_session",
       "backend_app_services_point_service_py_user",
-      "backend_app_services_point_service_rationale_9",
+      "backend_app_services_point_service_rationale_10",
       "backend_app_services_streak_service",
-      "backend_app_services_streak_service_rationale_12",
+      "backend_app_services_streak_service_rationale_13",
       "backend_app_services_streak_service_streakservice",
       "backend_app_services_todo_service",
       "backend_app_services_todo_service_py_session",
@@ -61,7 +65,12 @@
       "backend_tests_test_phase1_test_streak_service_handles_consecutive_days_and_a_gap",
       "backend_tests_test_phase1_test_todo_points_are_idempotent_and_miss_requires_reason",
       "backend_tests_test_phase1_today",
-      "datetime",
+      "backend_tests_test_phase3",
+      "backend_tests_test_phase3_test_accountability_summary_has_point_breakdown_and_reason_stats",
+      "backend_tests_test_phase3_test_daily_review_is_optional_updatable_and_owned",
+      "backend_tests_test_phase3_test_miss_reason_code_is_required_and_penalty_is_idempotent",
+      "backend_tests_test_phase3_test_streak_uses_successful_days_and_preserves_best_run",
+      "backend_tests_test_phase3_test_successful_day_requires_resolution_and_eighty_percent",
       "declarativebase",
       "fixture",
       "on_event"
@@ -71,10 +80,12 @@
       "frontend_src_api_api",
       "frontend_src_api_request",
       "frontend_src_app",
+      "frontend_src_app_accountabilitypage",
       "frontend_src_app_addcalendardays",
       "frontend_src_app_app",
       "frontend_src_app_authpage",
       "frontend_src_app_calendarpage",
+      "frontend_src_app_dailyreviewpage",
       "frontend_src_app_dashboardpage",
       "frontend_src_app_linkbrand",
       "frontend_src_app_noteeditor",
@@ -84,13 +95,18 @@
       "frontend_src_app_settingspage",
       "frontend_src_app_test",
       "frontend_src_app_todayfortimezone",
+      "frontend_src_app_tododatefromsearch",
       "frontend_src_app_todoeditor",
+      "frontend_src_app_todoshistorypage",
       "frontend_src_app_todospage",
       "frontend_src_components",
+      "frontend_src_components_accountabilitymessage",
       "frontend_src_components_calendarview",
       "frontend_src_components_carryforwarddialog",
+      "frontend_src_components_dailyreviewform",
       "frontend_src_components_emptystate",
       "frontend_src_components_errorstate",
+      "frontend_src_components_miss_reasons",
       "frontend_src_components_notecard",
       "frontend_src_components_spinner",
       "frontend_src_components_statcard",
@@ -101,10 +117,16 @@
       "frontend_src_main",
       "frontend_src_main_queryclient",
       "frontend_src_types",
+      "frontend_src_types_accountability",
       "frontend_src_types_calendarday",
       "frontend_src_types_calendarmonth",
+      "frontend_src_types_dailyreview",
       "frontend_src_types_dashboard",
+      "frontend_src_types_daymetrics",
+      "frontend_src_types_missreasoncode",
+      "frontend_src_types_missreasonstat",
       "frontend_src_types_note",
+      "frontend_src_types_pointbreakdown",
       "frontend_src_types_priority",
       "frontend_src_types_todo",
       "frontend_src_types_todostatus",
@@ -128,9 +150,11 @@
       "backend_app_api_todos_py_get",
       "backend_app_api_todos_py_patch",
       "backend_app_api_todos_py_post",
+      "backend_app_api_todos_reuse_todo",
+      "backend_app_api_todos_reuse_todos",
+      "backend_app_api_todos_todo_history",
       "backend_app_api_todos_unresolved_todos",
       "backend_app_api_todos_update_todo",
-      "backend_app_core_time_utc_now",
       "backend_app_schemas_todo",
       "backend_app_schemas_todo_carryforwardrequest",
       "backend_app_schemas_todo_misstodorequest",
@@ -139,12 +163,12 @@
       "backend_app_schemas_todo_py_basemodel",
       "backend_app_schemas_todo_py_model_validator",
       "backend_app_schemas_todo_py_strenum",
+      "backend_app_schemas_todo_reusetodorequest",
       "backend_app_schemas_todo_todocreate",
       "backend_app_schemas_todo_todocreate_clean_title",
       "backend_app_schemas_todo_todoresponse",
       "backend_app_schemas_todo_todostatusresponse",
       "backend_app_schemas_todo_todoupdate",
-      "backend_app_services_carry_forward_service_carryforwardservice",
       "backend_app_services_todo_service_py_todo",
       "backend_app_services_todo_service_py_user",
       "backend_app_services_todo_service_todoservice",
@@ -152,10 +176,59 @@
       "backend_app_services_todo_service_todoservice_create",
       "backend_app_services_todo_service_todoservice_delete",
       "backend_app_services_todo_service_todoservice_get",
+      "backend_app_services_todo_service_todoservice_is_equivalent",
       "backend_app_services_todo_service_todoservice_miss",
+      "backend_app_services_todo_service_todoservice_normalized",
+      "backend_app_services_todo_service_todoservice_reuse",
+      "backend_app_services_todo_service_todoservice_reuse_many",
+      "backend_app_services_todo_service_todoservice_reuse_one",
       "backend_app_services_todo_service_todoservice_update"
     ],
     "3": [
+      "autoprefixer",
+      "frontend_package",
+      "frontend_package_dependencies",
+      "frontend_package_dependencies_react",
+      "frontend_package_dependencies_react_dom",
+      "frontend_package_dependencies_react_router_dom",
+      "frontend_package_dependencies_tanstack_react_query",
+      "frontend_package_devdependencies",
+      "frontend_package_devdependencies_autoprefixer",
+      "frontend_package_devdependencies_jsdom",
+      "frontend_package_devdependencies_tailwindcss",
+      "frontend_package_devdependencies_testing_library_jest_dom",
+      "frontend_package_devdependencies_testing_library_react",
+      "frontend_package_devdependencies_types_react",
+      "frontend_package_devdependencies_types_react_dom",
+      "frontend_package_devdependencies_typescript",
+      "frontend_package_devdependencies_vite",
+      "frontend_package_devdependencies_vitejs_plugin_react",
+      "frontend_package_devdependencies_vitest",
+      "frontend_package_json_tailwindcss",
+      "frontend_package_name",
+      "frontend_package_private",
+      "frontend_package_scripts",
+      "frontend_package_scripts_build",
+      "frontend_package_scripts_dev",
+      "frontend_package_scripts_preview",
+      "frontend_package_scripts_test",
+      "frontend_package_type",
+      "frontend_package_version",
+      "jsdom",
+      "react",
+      "react_dom",
+      "react_router_dom",
+      "tanstack_react_query",
+      "testing_library_jest_dom",
+      "testing_library_react",
+      "types_react",
+      "types_react_dom",
+      "typescript",
+      "vite",
+      "vitejs_plugin_react",
+      "vitest"
+    ],
+    "4": [
       "backend_alembic_env_run_migrations_offline",
       "backend_app_api_auth",
       "backend_app_api_auth_login",
@@ -191,21 +264,18 @@
       "depends",
       "httpauthorizationcredentials"
     ],
-    "4": [
-      "backend_app_api_dashboard",
-      "backend_app_api_dashboard_dashboard",
-      "backend_app_api_dashboard_py_currentuser",
-      "backend_app_api_dashboard_py_dbsession",
-      "backend_app_api_dashboard_py_get",
+    "5": [
       "backend_app_api_streak_get_streak",
       "backend_app_api_streak_py_currentuser",
       "backend_app_api_streak_py_dbsession",
       "backend_app_api_streak_py_get",
       "backend_app_core_time",
       "backend_app_core_time_py_date",
+      "backend_app_core_time_py_datetime",
       "backend_app_core_time_user_today",
       "backend_app_core_time_user_tomorrow",
       "backend_app_core_time_user_zone",
+      "backend_app_core_time_utc_now",
       "backend_app_services_carry_forward_service_carryforwardservice_carry_forward",
       "backend_app_services_carry_forward_service_py_todo",
       "backend_app_services_carry_forward_service_py_user",
@@ -219,9 +289,51 @@
       "backend_tests_test_phase2_test_completed_and_missed_todos_cannot_be_carried_forward",
       "backend_tests_test_phase2_test_planning_points_are_awarded_once_for_original_tomorrow_plan",
       "backend_tests_test_phase2_tomorrow",
+      "backend_tests_test_todo_history_reuse",
+      "backend_tests_test_todo_history_reuse_make_old_todo",
+      "backend_tests_test_todo_history_reuse_py_date",
+      "backend_tests_test_todo_history_reuse_py_todo",
+      "backend_tests_test_todo_history_reuse_test_bulk_reuse_skips_equivalent_duplicates_and_rejects_expired_sources",
+      "backend_tests_test_todo_history_reuse_test_history_is_bounded_owned_and_searchable",
+      "backend_tests_test_todo_history_reuse_test_reuse_creates_new_todo_without_points_and_completion_is_normal",
+      "backend_tests_test_todo_history_reuse_test_todos_default_to_today_and_explicit_dates_work",
       "zoneinfo"
     ],
-    "5": [
+    "6": [
+      "backend_app_api_accountability",
+      "backend_app_api_accountability_accountability",
+      "backend_app_api_accountability_py_currentuser",
+      "backend_app_api_accountability_py_date",
+      "backend_app_api_accountability_py_dbsession",
+      "backend_app_api_accountability_py_get",
+      "backend_app_api_reviews",
+      "backend_app_api_reviews_create_review",
+      "backend_app_api_reviews_get_review",
+      "backend_app_api_reviews_py_currentuser",
+      "backend_app_api_reviews_py_date",
+      "backend_app_api_reviews_py_dbsession",
+      "backend_app_api_reviews_py_get",
+      "backend_app_api_reviews_py_patch",
+      "backend_app_api_reviews_py_post",
+      "backend_app_api_reviews_update_review",
+      "backend_app_schemas_accountability",
+      "backend_app_schemas_accountability_accountabilityresponse",
+      "backend_app_schemas_accountability_dailyreviewresponse",
+      "backend_app_schemas_accountability_dailyreviewupsert",
+      "backend_app_schemas_accountability_daymetricsresponse",
+      "backend_app_schemas_accountability_missreasonstat",
+      "backend_app_schemas_accountability_pointbreakdownresponse",
+      "backend_app_schemas_accountability_py_basemodel",
+      "backend_app_services_daily_review_service",
+      "backend_app_services_daily_review_service_dailyreviewservice",
+      "backend_app_services_daily_review_service_dailyreviewservice_get",
+      "backend_app_services_daily_review_service_dailyreviewservice_response",
+      "backend_app_services_daily_review_service_dailyreviewservice_save",
+      "backend_app_services_daily_review_service_py_date",
+      "backend_app_services_daily_review_service_py_user",
+      "dailyreview"
+    ],
+    "7": [
       "backend_app_api_notes",
       "backend_app_api_notes_create_note",
       "backend_app_api_notes_delete_note",
@@ -251,7 +363,37 @@
       "backend_app_schemas_note_py_basemodel",
       "backend_app_schemas_note_py_model_validator"
     ],
-    "6": [
+    "8": [
+      "backend_app_services_accountability_service_accountabilityservice",
+      "backend_app_services_accountability_service_accountabilityservice_belongs_to_day",
+      "backend_app_services_accountability_service_accountabilityservice_date_range",
+      "backend_app_services_accountability_service_accountabilityservice_day_metrics",
+      "backend_app_services_accountability_service_accountabilityservice_is_carried_for_day",
+      "backend_app_services_accountability_service_accountabilityservice_miss_reasons",
+      "backend_app_services_accountability_service_accountabilityservice_point_breakdown",
+      "backend_app_services_accountability_service_accountabilityservice_summary",
+      "backend_app_services_accountability_service_accountabilityservice_todos",
+      "backend_app_services_accountability_service_accountabilityservice_transaction_local_date",
+      "backend_app_services_accountability_service_daymetrics",
+      "backend_app_services_accountability_service_daymetrics_completion_rate",
+      "backend_app_services_accountability_service_daymetrics_neutral",
+      "backend_app_services_accountability_service_daymetrics_resolved",
+      "backend_app_services_accountability_service_daymetrics_successful",
+      "backend_app_services_accountability_service_py_date",
+      "backend_app_services_accountability_service_py_datetime",
+      "backend_app_services_accountability_service_py_session",
+      "backend_app_services_accountability_service_py_todo",
+      "backend_app_services_accountability_service_py_user",
+      "backend_app_services_accountability_service_rationale_57",
+      "backend_app_services_daily_review_service_dailyreviewservice_init",
+      "backend_app_services_daily_review_service_py_session",
+      "backend_app_services_streak_service_py_date",
+      "backend_app_services_streak_service_py_session",
+      "backend_app_services_streak_service_py_user",
+      "backend_app_services_streak_service_streakservice_recompute",
+      "missreasonstat"
+    ],
+    "9": [
       "backend_app_api_calendar",
       "backend_app_api_calendar_get_calendar",
       "backend_app_api_calendar_py_currentuser",
@@ -263,6 +405,7 @@
       "backend_app_repositories_todo_repository_todorepository",
       "backend_app_repositories_todo_repository_todorepository_get",
       "backend_app_repositories_todo_repository_todorepository_get_for_update",
+      "backend_app_repositories_todo_repository_todorepository_history",
       "backend_app_repositories_todo_repository_todorepository_list",
       "backend_app_repositories_todo_repository_todorepository_list_between",
       "backend_app_repositories_todo_repository_todorepository_unresolved",
@@ -278,32 +421,58 @@
       "backend_app_services_carry_forward_service_carryforwardservice_init",
       "backend_app_services_carry_forward_service_py_session"
     ],
-    "7": [
-      "autoprefixer",
-      "frontend_package_devdependencies",
-      "frontend_package_devdependencies_autoprefixer",
-      "frontend_package_devdependencies_jsdom",
-      "frontend_package_devdependencies_tailwindcss",
-      "frontend_package_devdependencies_testing_library_jest_dom",
-      "frontend_package_devdependencies_testing_library_react",
-      "frontend_package_devdependencies_types_react",
-      "frontend_package_devdependencies_types_react_dom",
-      "frontend_package_devdependencies_typescript",
-      "frontend_package_devdependencies_vite",
-      "frontend_package_devdependencies_vitejs_plugin_react",
-      "frontend_package_devdependencies_vitest",
-      "frontend_package_json_tailwindcss",
-      "jsdom",
-      "testing_library_jest_dom",
-      "testing_library_react",
-      "types_react",
-      "types_react_dom",
-      "typescript",
-      "vite",
-      "vitejs_plugin_react",
-      "vitest"
+    "10": [
+      "codex_skills_graphify_skill",
+      "codex_skills_graphify_skill_for_graphify_add_and_watch",
+      "codex_skills_graphify_skill_for_graphify_query",
+      "codex_skills_graphify_skill_for_the_commit_hook_and_native_claude_md_integration",
+      "codex_skills_graphify_skill_for_update_and_cluster_only",
+      "codex_skills_graphify_skill_graphify",
+      "codex_skills_graphify_skill_honesty_rules",
+      "codex_skills_graphify_skill_interpreter_guard_for_subcommands",
+      "codex_skills_graphify_skill_part_a_structural_extraction_for_code_files",
+      "codex_skills_graphify_skill_part_b_semantic_extraction_parallel_subagents",
+      "codex_skills_graphify_skill_part_c_merge_ast_semantic_into_final_extraction",
+      "codex_skills_graphify_skill_step_0_github_repos_and_multi_path_merge_only_if_a_url_or_several_paths",
+      "codex_skills_graphify_skill_step_1_ensure_graphify_is_installed",
+      "codex_skills_graphify_skill_step_2_5_video_and_audio_only_if_video_files_detected",
+      "codex_skills_graphify_skill_step_2_detect_files",
+      "codex_skills_graphify_skill_step_3_extract_entities_and_relationships",
+      "codex_skills_graphify_skill_step_4_5_graph_health_check_read_only_integrity_gate",
+      "codex_skills_graphify_skill_step_4_build_graph_cluster_analyze_generate_outputs",
+      "codex_skills_graphify_skill_step_5_label_communities",
+      "codex_skills_graphify_skill_step_6_generate_obsidian_vault_opt_in_html",
+      "codex_skills_graphify_skill_step_9_save_manifest_update_cost_tracker_clean_up_and_report",
+      "codex_skills_graphify_skill_steps_6b_8_wiki_neo4j_falkordb_svg_graphml_mcp_benchmark_only_on_their_flags",
+      "codex_skills_graphify_skill_usage",
+      "codex_skills_graphify_skill_what_graphify_is_for",
+      "codex_skills_graphify_skill_what_you_must_do_when_invoked"
     ],
-    "8": [
+    "11": [
+      "backend_app_api_dashboard",
+      "backend_app_api_dashboard_dashboard",
+      "backend_app_api_dashboard_py_currentuser",
+      "backend_app_api_dashboard_py_dbsession",
+      "backend_app_api_dashboard_py_get",
+      "backend_app_api_points",
+      "backend_app_api_points_points_history",
+      "backend_app_api_points_points_summary",
+      "backend_app_api_points_py_currentuser",
+      "backend_app_api_points_py_dbsession",
+      "backend_app_api_points_py_get",
+      "backend_app_repositories_point_repository_pointrepository",
+      "backend_app_repositories_point_repository_pointrepository_history",
+      "backend_app_repositories_point_repository_pointrepository_planning_points_for_date",
+      "backend_app_repositories_point_repository_pointrepository_total",
+      "backend_app_repositories_point_repository_py_date",
+      "backend_app_repositories_point_repository_py_session",
+      "backend_app_schemas_common",
+      "backend_app_schemas_common_dashboardresponse",
+      "backend_app_schemas_common_pointtransactionresponse",
+      "backend_app_schemas_common_py_basemodel",
+      "backend_app_schemas_common_streakresponse"
+    ],
+    "12": [
       "frontend_tsconfig_app",
       "frontend_tsconfig_app_compileroptions",
       "frontend_tsconfig_app_compileroptions_allowjs",
@@ -326,28 +495,7 @@
       "ref_dom_iterable",
       "ref_src"
     ],
-    "9": [
-      "frontend_package",
-      "frontend_package_dependencies",
-      "frontend_package_dependencies_react",
-      "frontend_package_dependencies_react_dom",
-      "frontend_package_dependencies_react_router_dom",
-      "frontend_package_dependencies_tanstack_react_query",
-      "frontend_package_name",
-      "frontend_package_private",
-      "frontend_package_scripts",
-      "frontend_package_scripts_build",
-      "frontend_package_scripts_dev",
-      "frontend_package_scripts_preview",
-      "frontend_package_scripts_test",
-      "frontend_package_type",
-      "frontend_package_version",
-      "react",
-      "react_dom",
-      "react_router_dom",
-      "tanstack_react_query"
-    ],
-    "10": [
+    "13": [
       "frontend_tsconfig_node",
       "frontend_tsconfig_node_compileroptions",
       "frontend_tsconfig_node_compileroptions_allowimportingtsextensions",
@@ -365,215 +513,290 @@
       "ref_vite_config_ts",
       "ref_vitest_config_ts"
     ],
-    "11": [
-      "backend_app_api_points",
-      "backend_app_api_points_points_history",
-      "backend_app_api_points_points_summary",
-      "backend_app_api_points_py_currentuser",
-      "backend_app_api_points_py_dbsession",
-      "backend_app_api_points_py_get",
-      "backend_app_schemas_common",
-      "backend_app_schemas_common_dashboardresponse",
-      "backend_app_schemas_common_pointtransactionresponse",
-      "backend_app_schemas_common_py_basemodel",
-      "backend_app_schemas_common_streakresponse"
+    "14": [
+      "readme",
+      "readme_architecture",
+      "readme_environment_variables",
+      "readme_future_phases",
+      "readme_local_development",
+      "readme_phase_1_and_phase_2_scope",
+      "readme_phase_2_rules",
+      "readme_phase_3_rules",
+      "readme_run_with_docker",
+      "readme_tests",
+      "readme_todo_history_and_reuse_rules",
+      "readme_two_do_notes"
     ],
-    "12": [
-      "backend_app_services_streak_service_py_date",
-      "backend_app_services_streak_service_py_session",
-      "backend_app_services_streak_service_py_user",
-      "backend_app_services_streak_service_streakservice_recompute"
+    "15": [
+      "codex_skills_graphify_references_exports",
+      "codex_skills_graphify_references_exports_graphify_reference_extra_exports_and_benchmark",
+      "codex_skills_graphify_references_exports_step_6b_wiki_only_if_wiki_flag",
+      "codex_skills_graphify_references_exports_step_7_neo4j_export_only_if_neo4j_or_neo4j_push_flag",
+      "codex_skills_graphify_references_exports_step_7a_falkordb_export_only_if_falkordb_or_falkordb_push_flag",
+      "codex_skills_graphify_references_exports_step_7b_svg_export_only_if_svg_flag",
+      "codex_skills_graphify_references_exports_step_7c_graphml_export_only_if_graphml_flag",
+      "codex_skills_graphify_references_exports_step_7d_mcp_server_only_if_mcp_flag",
+      "codex_skills_graphify_references_exports_step_8_token_reduction_benchmark_only_if_total_words_5000"
     ],
-    "13": [
+    "16": [
+      "codex_skills_graphify_references_query",
+      "codex_skills_graphify_references_query_for_graphify_explain",
+      "codex_skills_graphify_references_query_for_graphify_path",
+      "codex_skills_graphify_references_query_graphify_reference_query_path_explain",
+      "codex_skills_graphify_references_query_step_0_constrained_query_expansion_required_before_traversal",
+      "codex_skills_graphify_references_query_step_1_traversal"
+    ],
+    "17": [
+      "backend_alembic_versions_0002_phase2_planning_carry_forward",
+      "backend_alembic_versions_0002_phase2_planning_carry_forward_downgrade",
+      "backend_alembic_versions_0002_phase2_planning_carry_forward_rationale_12",
+      "backend_alembic_versions_0002_phase2_planning_carry_forward_upgrade",
+      "backend_alembic_versions_0002_phase2_planning_carry_forward_widen_alembic_version_column"
+    ],
+    "18": [
+      "codex_skills_graphify_references_add_watch",
+      "codex_skills_graphify_references_add_watch_for_graphify_add",
+      "codex_skills_graphify_references_add_watch_for_watch",
+      "codex_skills_graphify_references_add_watch_graphify_reference_add_a_url_and_watch_a_folder"
+    ],
+    "19": [
+      "codex_skills_graphify_references_hooks",
+      "codex_skills_graphify_references_hooks_for_git_commit_hook",
+      "codex_skills_graphify_references_hooks_for_native_claude_md_integration",
+      "codex_skills_graphify_references_hooks_graphify_reference_commit_hook_and_native_claude_md_integration"
+    ],
+    "20": [
+      "codex_skills_graphify_references_update",
+      "codex_skills_graphify_references_update_for_cluster_only",
+      "codex_skills_graphify_references_update_for_update_incremental_re_extraction",
+      "codex_skills_graphify_references_update_graphify_reference_incremental_update_and_cluster_only"
+    ],
+    "21": [
       "backend_alembic_versions_0001_initial",
       "backend_alembic_versions_0001_initial_downgrade",
       "backend_alembic_versions_0001_initial_upgrade"
     ],
-    "14": [
-      "backend_alembic_versions_0002_phase2_planning_carry_forward",
-      "backend_alembic_versions_0002_phase2_planning_carry_forward_downgrade",
-      "backend_alembic_versions_0002_phase2_planning_carry_forward_upgrade"
+    "22": [
+      "backend_alembic_versions_0003_phase3_accountability",
+      "backend_alembic_versions_0003_phase3_accountability_downgrade",
+      "backend_alembic_versions_0003_phase3_accountability_upgrade"
     ],
-    "15": [
+    "23": [
+      "backend_alembic_versions_0004_todo_history_reuse",
+      "backend_alembic_versions_0004_todo_history_reuse_downgrade",
+      "backend_alembic_versions_0004_todo_history_reuse_upgrade"
+    ],
+    "24": [
+      "codex_skills_graphify_references_github_and_merge",
+      "codex_skills_graphify_references_github_and_merge_graphify_reference_github_clone_and_cross_repo_merge",
+      "codex_skills_graphify_references_github_and_merge_step_0_clone_github_repo_s_only_if_a_github_url_was_given"
+    ],
+    "25": [
+      "codex_skills_graphify_references_transcribe",
+      "codex_skills_graphify_references_transcribe_graphify_reference_transcribe_video_and_audio",
+      "codex_skills_graphify_references_transcribe_step_2_5_transcribe_video_audio_files_only_if_video_files_detected"
+    ],
+    "26": [
       "frontend_tsconfig",
       "frontend_tsconfig_files",
       "frontend_tsconfig_references"
     ],
-    "16": [
+    "27": [
+      "agents",
+      "agents_graphify"
+    ],
+    "28": [
+      "codex_skills_graphify_references_extraction_spec",
+      "codex_skills_graphify_references_extraction_spec_graphify_reference_extraction_subagent_prompt_compact"
+    ],
+    "29": [
       "frontend_vitest_polyfill",
       "frontend_vitest_polyfill_nodecrypto"
     ],
-    "17": [
+    "30": [
       "backend_app_core_init"
     ],
-    "18": [
+    "31": [
       "backend_app_db_init"
     ],
-    "19": [
+    "32": [
       "backend_app_init"
     ],
-    "20": [
+    "33": [
       "backend_app_repositories_init"
     ],
-    "21": [
+    "34": [
       "backend_app_schemas_init"
     ],
-    "22": [
+    "35": [
       "frontend_postcss_config"
     ],
-    "23": [
+    "36": [
       "frontend_src_test_setup"
     ],
-    "24": [
+    "37": [
       "frontend_src_vite_env_d"
     ],
-    "25": [
+    "38": [
       "frontend_tailwind_config"
     ],
-    "26": [
+    "39": [
       "frontend_vite_config"
     ],
-    "27": [
+    "40": [
       "frontend_vitest_config"
     ],
-    "28": [
+    "41": [
       "tailwindcss_tailwindcss"
     ]
   },
   "cohesion": {
-    "0": 0.08779761904761904,
-    "1": 0.08084163898117387,
-    "2": 0.11962833914053426,
-    "3": 0.11586452762923351,
-    "4": 0.10846560846560846,
-    "5": 0.15343915343915343,
-    "6": 0.15333333333333332,
-    "7": 0.08695652173913043,
-    "8": 0.09523809523809523,
-    "9": 0.10526315789473684,
-    "10": 0.125,
-    "11": 0.2909090909090909,
-    "12": 0.5,
-    "13": 0.6666666666666666,
-    "14": 0.6666666666666666,
-    "15": 0.6666666666666666,
-    "16": 1.0,
-    "17": 1.0,
-    "18": 1.0,
-    "19": 1.0,
-    "20": 1.0,
-    "21": 1.0,
-    "22": 1.0,
-    "23": 1.0,
-    "24": 1.0,
-    "25": 1.0,
-    "26": 1.0,
+    "0": 0.07724505327245053,
+    "1": 0.06363636363636363,
+    "2": 0.11224489795918367,
+    "3": 0.047619047619047616,
+    "4": 0.11586452762923351,
+    "5": 0.09659090909090909,
+    "6": 0.12903225806451613,
+    "7": 0.15343915343915343,
+    "8": 0.1455026455026455,
+    "9": 0.15384615384615385,
+    "10": 0.08,
+    "11": 0.15151515151515152,
+    "12": 0.09523809523809523,
+    "13": 0.125,
+    "14": 0.16666666666666666,
+    "15": 0.2222222222222222,
+    "16": 0.3333333333333333,
+    "17": 0.5,
+    "18": 0.5,
+    "19": 0.5,
+    "20": 0.5,
+    "21": 0.6666666666666666,
+    "22": 0.6666666666666666,
+    "23": 0.6666666666666666,
+    "24": 0.6666666666666666,
+    "25": 0.6666666666666666,
+    "26": 0.6666666666666666,
     "27": 1.0,
-    "28": 1.0
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0,
+    "35": 1.0,
+    "36": 1.0,
+    "37": 1.0,
+    "38": 1.0,
+    "39": 1.0,
+    "40": 1.0,
+    "41": 1.0
   },
   "gods": [
     {
-      "id": "backend_app_services_todo_service_todoservice",
-      "label": "TodoService",
-      "degree": 23
-    },
-    {
       "id": "backend_app_models_user_user",
       "label": "User",
-      "degree": 22
+      "degree": 31
     },
     {
-      "id": "backend_app_repositories_todo_repository_todorepository",
-      "label": "TodoRepository",
-      "degree": 21
+      "id": "backend_app_services_todo_service_todoservice",
+      "label": "TodoService",
+      "degree": 30
     },
     {
-      "id": "backend_app_models_todo_todo",
-      "label": "Todo",
-      "degree": 17
-    },
-    {
-      "id": "backend_app_services_streak_service_streakservice",
-      "label": "StreakService",
-      "degree": 16
+      "id": "backend_app_services_accountability_service_accountabilityservice",
+      "label": "AccountabilityService",
+      "degree": 28
     },
     {
       "id": "backend_app_core_time_user_today",
       "label": "user_today()",
-      "degree": 16
+      "degree": 27
+    },
+    {
+      "id": "backend_app_models_todo_todo",
+      "label": "Todo",
+      "degree": 24
+    },
+    {
+      "id": "backend_app_repositories_todo_repository_todorepository",
+      "label": "TodoRepository",
+      "degree": 23
+    },
+    {
+      "id": "backend_app_services_streak_service_streakservice",
+      "label": "StreakService",
+      "degree": 18
     },
     {
       "id": "backend_app_db_session_base",
       "label": "Base",
+      "degree": 17
+    },
+    {
+      "id": "backend_app_models_todo_todostatus",
+      "label": "TodoStatus",
       "degree": 15
     },
     {
       "id": "frontend_tsconfig_app_compileroptions",
       "label": "compilerOptions",
       "degree": 15
-    },
-    {
-      "id": "backend_app_repositories_point_repository_pointrepository",
-      "label": "PointRepository",
-      "degree": 12
-    },
-    {
-      "id": "backend_app_services_point_service_pointservice",
-      "label": "PointService",
-      "degree": 11
     }
   ],
   "surprises": [
     {
-      "source": "TodoService",
-      "target": "TransactionType",
+      "source": "accountability()",
+      "target": "AccountabilityService",
       "source_files": [
-        "backend/app/services/todo_service.py",
-        "backend/app/models/point_transaction.py"
+        "backend/app/api/accountability.py",
+        "backend/app/services/accountability_service.py"
       ],
       "confidence": "INFERRED",
       "relation": "uses",
       "why": "inferred connection - not explicitly stated in source; bridges separate communities"
     },
     {
-      "source": "TodoRepository",
-      "target": "Todo",
+      "source": "register()",
+      "target": "User",
       "source_files": [
-        "backend/app/repositories/todo_repository.py",
-        "backend/app/models/todo.py"
+        "backend/app/api/auth.py",
+        "backend/app/models/user.py"
       ],
       "confidence": "INFERRED",
       "relation": "uses",
       "why": "inferred connection - not explicitly stated in source; bridges separate communities"
     },
     {
-      "source": "CarryForwardService",
-      "target": "Todo",
+      "source": "login()",
+      "target": "User",
       "source_files": [
-        "backend/app/services/carry_forward_service.py",
-        "backend/app/models/todo.py"
+        "backend/app/api/auth.py",
+        "backend/app/models/user.py"
       ],
       "confidence": "INFERRED",
       "relation": "uses",
       "why": "inferred connection - not explicitly stated in source; bridges separate communities"
     },
     {
-      "source": "TodoService",
-      "target": "Todo",
+      "source": "dashboard()",
+      "target": "NoteRepository",
       "source_files": [
-        "backend/app/services/todo_service.py",
-        "backend/app/models/todo.py"
+        "backend/app/api/dashboard.py",
+        "backend/app/repositories/note_repository.py"
       ],
       "confidence": "INFERRED",
       "relation": "uses",
       "why": "inferred connection - not explicitly stated in source; bridges separate communities"
     },
     {
-      "source": "CarryForwardService",
-      "target": "TodoStatus",
+      "source": "dashboard()",
+      "target": "TodoRepository",
       "source_files": [
-        "backend/app/services/carry_forward_service.py",
-        "backend/app/models/todo.py"
+        "backend/app/api/dashboard.py",
+        "backend/app/repositories/todo_repository.py"
       ],
       "confidence": "INFERRED",
       "relation": "uses",
@@ -583,38 +806,38 @@
   "questions": [
     {
       "type": "bridge_node",
-      "question": "Why does `User` connect `Community 0` to `Community 2`, `Community 3`, `Community 6`?",
-      "why": "High betweenness centrality (0.052) - this node is a cross-community bridge."
+      "question": "Why does `User` connect `User` to `TodoService`, `api/auth.py`, `user_today`, `DailyReviewService`, `AccountabilityService`, `TodoRepository`?",
+      "why": "High betweenness centrality (0.061) - this node is a cross-community bridge."
     },
     {
       "type": "bridge_node",
-      "question": "Why does `TodoRepository` connect `Community 6` to `Community 0`, `Community 2`, `Community 4`?",
-      "why": "High betweenness centrality (0.048) - this node is a cross-community bridge."
+      "question": "Why does `AccountabilityService` connect `AccountabilityService` to `User`, `dashboard.py`, `DailyReviewService`?",
+      "why": "High betweenness centrality (0.044) - this node is a cross-community bridge."
     },
     {
       "type": "bridge_node",
-      "question": "Why does `TodoService` connect `Community 2` to `Community 0`, `Community 6`?",
-      "why": "High betweenness centrality (0.035) - this node is a cross-community bridge."
+      "question": "Why does `TodoService` connect `TodoService` to `User`, `TodoRepository`?",
+      "why": "High betweenness centrality (0.032) - this node is a cross-community bridge."
     },
     {
       "type": "verify_inferred",
-      "question": "Are the 14 inferred relationships involving `TodoService` (e.g. with `complete_todo()` and `create_todo()`) actually correct?",
-      "why": "`TodoService` has 14 INFERRED edges - model-reasoned connections that need verification."
+      "question": "Are the 13 inferred relationships involving `User` (e.g. with `login()` and `register()`) actually correct?",
+      "why": "`User` has 13 INFERRED edges - model-reasoned connections that need verification."
     },
     {
       "type": "verify_inferred",
-      "question": "Are the 9 inferred relationships involving `User` (e.g. with `login()` and `register()`) actually correct?",
-      "why": "`User` has 9 INFERRED edges - model-reasoned connections that need verification."
+      "question": "Are the 16 inferred relationships involving `TodoService` (e.g. with `complete_todo()` and `create_todo()`) actually correct?",
+      "why": "`TodoService` has 16 INFERRED edges - model-reasoned connections that need verification."
     },
     {
       "type": "verify_inferred",
-      "question": "Are the 7 inferred relationships involving `TodoRepository` (e.g. with `dashboard()` and `list_todos()`) actually correct?",
-      "why": "`TodoRepository` has 7 INFERRED edges - model-reasoned connections that need verification."
+      "question": "Are the 9 inferred relationships involving `AccountabilityService` (e.g. with `accountability()` and `dashboard()`) actually correct?",
+      "why": "`AccountabilityService` has 9 INFERRED edges - model-reasoned connections that need verification."
     },
     {
       "type": "verify_inferred",
-      "question": "Are the 6 inferred relationships involving `Todo` (e.g. with `PointRepository` and `TodoRepository`) actually correct?",
-      "why": "`Todo` has 6 INFERRED edges - model-reasoned connections that need verification."
+      "question": "Are the 7 inferred relationships involving `Todo` (e.g. with `PointRepository` and `TodoRepository`) actually correct?",
+      "why": "`Todo` has 7 INFERRED edges - model-reasoned connections that need verification."
     }
   ]
 }

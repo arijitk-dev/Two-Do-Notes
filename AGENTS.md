@@ -34,6 +34,7 @@ Important rules:
 - A successful day requires every planned Todo to be resolved and at least 80% completed; zero-Todo days are neutral.
 - Daily Reviews are optional reflection records and never affect points.
 - Accountability metrics derive from canonical Todo and point-ledger data; do not store duplicate aggregates.
+- The normal Todo history/reuse interface is limited to the latest 15 calendar days. Older Todo rows are retained unless a future audited retention process is added, so accountability and point history remain trustworthy.
 - Tests are required for business-rule changes.
 - Do not introduce unnecessary infrastructure.
 - Do not implement future-phase features without explicit approval.

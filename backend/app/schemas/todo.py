@@ -56,6 +56,7 @@ class TodoResponse(BaseModel):
     carried_from_date: date | None
     carry_forward_count: int
     carry_forward_bonus_awarded: bool
+    source_todo_id: str | None
 
 
 class MissTodoRequest(BaseModel):
@@ -81,4 +82,8 @@ class MissTodoRequest(BaseModel):
 
 
 class CarryForwardRequest(BaseModel):
+    todo_ids: list[str] = Field(min_length=1, max_length=100)
+
+
+class ReuseTodoRequest(BaseModel):
     todo_ids: list[str] = Field(min_length=1, max_length=100)

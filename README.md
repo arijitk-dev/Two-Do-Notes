@@ -4,7 +4,7 @@ Two Do Notes is a personal productivity and accountability app built around a si
 
 ## Phase 1 and Phase 2 scope
 
-This implementation includes registration/login, timezone-aware scheduled Todos, completion and missed-task ledger transactions, streaks, Notes, dashboard summaries, responsive browser UI, and Docker Compose development. Phase 2 adds a month calendar, date filtering, future planning, +2 points for a Todo first planned for tomorrow, and explicit selected-Todo carry-forward with a one-time +1 completion bonus. Phase 3 adds truthful completion/miss confirmation, optional Daily Reviews, formal successful-day streaks, planning accuracy, carry-forward and missed-reason analysis, point breakdowns, overplanning detection, and an accountability page.
+This implementation includes registration/login, timezone-aware scheduled Todos, completion and missed-task ledger transactions, streaks, Notes, dashboard summaries, responsive browser UI, and Docker Compose development. Phase 2 adds a month calendar, date filtering, future planning, +2 points for a Todo first planned for tomorrow, and explicit selected-Todo carry-forward with a one-time +1 completion bonus. Phase 3 adds truthful completion/miss confirmation, optional Daily Reviews, formal successful-day streaks, planning accuracy, carry-forward and missed-reason analysis, point breakdowns, overplanning detection, and an accountability page. The Todo add-on makes the default Todo view today-first and adds a bounded history/reuse workflow.
 
 ## Architecture
 
@@ -13,7 +13,7 @@ The backend is a modular FastAPI application. Routes are thin and delegate busin
 ```
 backend/app/{api,core,db,models,schemas,repositories,services}
 frontend/src/{App.tsx,api.ts,components.tsx,layout.tsx,styles.css}
-backend/alembic/versions/{0001_initial,0002_phase2_planning_carry_forward,0003_phase3_accountability}.py
+backend/alembic/versions/{0001_initial,0002_phase2_planning_carry_forward,0003_phase3_accountability,0004_todo_history_reuse}.py
 docker-compose.yml
 ```
 
@@ -52,7 +52,7 @@ cd backend && pytest
 cd frontend && npm test
 ```
 
-Backend tests use isolated SQLite and cover authentication, protection, ownership, Todo CRUD actions, idempotent points, missed reasons, streak initialization, and Notes. Frontend tests use Vitest and React Testing Library.
+Backend tests use isolated SQLite and cover authentication, protection, ownership, Todo CRUD actions, idempotent points, missed reasons, streak initialization, Notes, today defaults, 15-day history, and safe reuse. Frontend tests use Vitest and React Testing Library.
 
 ## Phase 2 rules
 
@@ -73,6 +73,14 @@ Phase 2 API additions include `GET /api/v1/calendar?year=YYYY&month=M`, `GET /ap
 - Accountability metrics are derived from Todo state and the immutable point ledger. The rolling 7-day view warns when average planning is at least five Todos per day and completion is below 70%.
 
 Phase 3 API additions include `GET /api/v1/accountability?range=today|7d|month`, `GET /api/v1/reviews/{date}`, `POST /api/v1/reviews/{date}`, and `PATCH /api/v1/reviews/{date}`.
+
+## Todo history and reuse rules
+
+- `GET /api/v1/todos` without a date returns only the user's local today. `?date=YYYY-MM-DD` remains available for explicit calendar dates; `start_date` and `end_date` are database-filtered range queries.
+- `GET /api/v1/todos/history` returns today plus the prior 14 calendar days (15 dates total). It supports an optional title/description search.
+- `POST /api/v1/todos/{todo_id}/reuse` and `POST /api/v1/todos/reuse` create new pending Todos for today by copying only title, description, and priority. Reuse awards no points; later completion uses the normal +3 rule. New rows keep `source_todo_id` for auditability.
+- Equivalent same-day Todos are not duplicated. Bulk reuse skips equivalent items; single-item reuse reports a conflict so the UI can say the Todo is already on today's list.
+- The 15-day limit is enforced server-side for the normal history/reuse interface. Older Todo rows are not automatically hard-deleted, because canonical Todo state and the immutable point ledger remain auditable for accountability and streak calculations.
 
 ## Environment variables
 

@@ -1,10 +1,11 @@
-from datetime import date
+from datetime import date, timedelta
 
 from fastapi import APIRouter, Query, Response, status
 from app.api.deps import CurrentUser, DbSession
+from app.core.accountability import TODO_HISTORY_RETENTION_DAYS
 from app.core.time import user_today
 from app.repositories.todo_repository import TodoRepository
-from app.schemas.todo import CarryForwardRequest, MissTodoRequest, TodoCreate, TodoResponse, TodoUpdate
+from app.schemas.todo import CarryForwardRequest, MissTodoRequest, ReuseTodoRequest, TodoCreate, TodoResponse, TodoUpdate
 from app.services.carry_forward_service import CarryForwardService
 from app.services.todo_service import TodoService
 
@@ -17,13 +18,42 @@ def list_todos(
     db: DbSession,
     date_filter: date | None = Query(default=None, alias="date"),
     scheduled_date: date | None = Query(default=None),
+    start_date: date | None = Query(default=None),
+    end_date: date | None = Query(default=None),
 ):
-    return TodoRepository().list(db, user.id, date_filter or scheduled_date)
+    selected_date = date_filter or scheduled_date
+    if selected_date:
+        return TodoRepository().list(db, user.id, selected_date)
+    if start_date or end_date:
+        return TodoRepository().list(db, user.id, start_date=start_date, end_date=end_date)
+    return TodoRepository().list(db, user.id, user_today(user.timezone))
 
 
 @router.post("", response_model=TodoResponse, status_code=status.HTTP_201_CREATED)
 def create_todo(payload: TodoCreate, user: CurrentUser, db: DbSession):
     return TodoService(db).create(user, payload)
+
+
+@router.get("/history", response_model=list[TodoResponse])
+def todo_history(user: CurrentUser, db: DbSession, search: str | None = Query(default=None, max_length=160)):
+    today = user_today(user.timezone)
+    return TodoRepository().history(
+        db,
+        user.id,
+        today - timedelta(days=TODO_HISTORY_RETENTION_DAYS - 1),
+        today,
+        search.strip() if search else None,
+    )
+
+
+@router.post("/reuse", response_model=list[TodoResponse], status_code=status.HTTP_201_CREATED)
+def reuse_todos(payload: ReuseTodoRequest, user: CurrentUser, db: DbSession):
+    return TodoService(db).reuse_many(user, payload.todo_ids)
+
+
+@router.post("/{todo_id}/reuse", response_model=TodoResponse, status_code=status.HTTP_201_CREATED)
+def reuse_todo(todo_id: str, user: CurrentUser, db: DbSession):
+    return TodoService(db).reuse(user, todo_id)
 
 
 @router.get("/unresolved", response_model=list[TodoResponse])
