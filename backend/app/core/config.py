@@ -10,6 +10,11 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 1440
     default_timezone: str = "Asia/Kolkata"
     frontend_origin: str = "http://localhost:5173"
+    # Email settings
+    resend_api_key: str = ""
+    email_from: str = "noreply@two-do-notes.com"
+    frontend_url: str = "http://localhost:5173"
+    cron_secret: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=False, extra="ignore")
 

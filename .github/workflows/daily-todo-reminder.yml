@@ -1,0 +1,54 @@
+name: Daily Todo Reminder
+
+on:
+  schedule:
+    # Run at 04:30 UTC (10:00 AM Asia/Kolkata)
+    - cron: "30 4 * * *"
+  workflow_dispatch:
+    # Allow manual triggering for testing
+    inputs:
+      environment:
+        description: "Environment to run against"
+        required: false
+        default: "production"
+
+jobs:
+  send-reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger daily reminder job
+        env:
+          RENDER_URL: ${{ secrets.RENDER_DAILY_REMINDER_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$RENDER_URL" ]; then
+            echo "Error: RENDER_DAILY_REMINDER_URL secret not configured"
+            exit 1
+          fi
+
+          if [ -z "$CRON_SECRET" ]; then
+            echo "Error: CRON_SECRET secret not configured"
+            exit 1
+          fi
+
+          echo "Triggering daily reminder job..."
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+            "$RENDER_URL/internal/jobs/daily-todo-reminder" \
+            -H "X-Cron-Secret: $CRON_SECRET" \
+            -H "Content-Type: application/json")
+
+          # Extract HTTP status code (last line)
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          # Extract body (all lines except last)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          echo "Response Status: $HTTP_CODE"
+          echo "Response Body: $BODY"
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "Error: Job failed with status $HTTP_CODE"
+            exit 1
+          fi
+
+          echo "✓ Daily reminder job completed successfully"

@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import accountability, auth, calendar, dashboard, notes, points, reviews, streak, todos
+from app.api import accountability, auth, calendar, dashboard, internal, notes, points, reviews, streak, todos
 from app.core.config import get_settings
 from app.models import note, point_transaction, streak as streak_model, todo, user  # noqa: F401
 
@@ -28,6 +28,7 @@ app.include_router(dashboard.router, prefix="/api/v1")
 app.include_router(calendar.router, prefix="/api/v1")
 app.include_router(accountability.router, prefix="/api/v1")
 app.include_router(reviews.router, prefix="/api/v1")
+app.include_router(internal.router)
 
 
 @app.get("/health", tags=["system"])
